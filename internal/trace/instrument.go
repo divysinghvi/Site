@@ -55,7 +55,7 @@ func (t *tracedCollector) Run(ctx context.Context) (collector.Result, error) {
 	if t.Disabled() {
 		return t.Collector.Run(ctx)
 	}
-	name := t.Collector.Name()
+	name := t.Name()
 	opts := []oteltrace.SpanStartOption{
 		oteltrace.WithNewRoot(),
 		oteltrace.WithSpanKind(oteltrace.SpanKindInternal),

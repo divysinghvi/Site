@@ -8,7 +8,6 @@ package og
 import (
 	"bytes"
 	"fmt"
-	"image/color"
 	"strings"
 	"sync"
 
@@ -314,11 +313,4 @@ func encode(dc *gg.Context) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
-}
-
-// hexColor is exported for tests that assert the palette.
-func hexColor(s string) color.Color {
-	var r, g, b uint8
-	_, _ = fmt.Sscanf(strings.TrimPrefix(s, "#"), "%02x%02x%02x", &r, &g, &b)
-	return color.RGBA{R: r, G: g, B: b, A: 255}
 }
