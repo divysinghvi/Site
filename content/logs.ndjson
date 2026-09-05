@@ -1,0 +1,90 @@
+{"ts":"2023-01-01T00:00:00Z","precision":"year","level":"info","service":"divy","span":"divy.career","msg":"career trace started: student in Rajasthan, India","github":"divysinghvi","tz":"Asia/Kolkata"}
+{"ts":"TODO(divy)","level":"info","service":"divy","span":"divy.career","msg":"open to backend/infra/SRE internships and roles","open_to":"backend intern,infra,sre","runbook":"/contact"}
+{"ts":"TODO(divy)","level":"debug","service":"divy","span":"divy.career","msg":"low-level systems interest logged: x86-64 asm, WebAssembly, LLVM","interests":"x86-64-asm,webassembly,llvm"}
+{"ts":"TODO(divy)","level":"debug","service":"divy","span":"divy.career","msg":"competitive programming: LeetCode streak at TODO(divy) days","platform":"leetcode","streak_days":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"community","msg":"joined the GDG core team for community events","org":"gdg","role":"core-team"}
+{"ts":"TODO(divy)","level":"info","service":"community","msg":"joined the AWS community core team for community events","org":"aws-community","role":"core-team"}
+{"ts":"2023-01-01T00:00:00Z","precision":"year","level":"info","service":"edu","span":"edu.btech-ece","msg":"enrolled: B.Tech Electronics & Communication Engineering, College of Technology and Engineering, Udaipur","expected_graduation":"2027"}
+{"ts":"TODO(divy)","level":"debug","service":"edu","span":"edu.btech-ece","msg":"coursework highlight: TODO(divy)","branch":"ece"}
+{"ts":"TODO(divy)","level":"info","service":"freelance","span":"freelance.web-dev","msg":"started freelance web and app development","role":"freelance-developer"}
+{"ts":"TODO(divy)","level":"info","service":"freelance","span":"freelance.web-dev","msg":"delivered freelance project: TODO(divy) (sanitized one-liner)","client":"TODO(divy)"}
+{"ts":"2024-05-01T00:00:00Z","precision":"month","level":"info","service":"ef-polymer","span":"ef-polymer.swe-intern","msg":"joined EF Polymer Ltd. as Software Engineering Intern","sector":"agritech","company_country":"JP"}
+{"ts":"TODO(divy)","level":"debug","service":"ef-polymer","span":"ef-polymer.swe-intern","msg":"working with the Japanese team remotely; collaboration ran 12 months, remote and in person","team":"japan"}
+{"ts":"2025-07-01T00:00:00Z","precision":"month","level":"info","service":"ef-polymer","span":"ef-polymer.swe-intern","msg":"internship complete: Sales & Warehouse Management System deployed across multiple warehouses","team":"japan","months_with_team":12}
+{"ts":"TODO(divy)","level":"info","service":"ef-polymer","component":"sales-wms","span":"sales-wms.build","msg":"started building the Sales & Warehouse Management System","stack":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"ef-polymer","component":"sales-wms","span":"sales-wms.build","msg":"first prod deploy of the Sales & Warehouse Management System","deploy":"first"}
+{"ts":"TODO(divy)","level":"info","service":"ef-polymer","component":"sales-wms","span":"sales-wms.multi-warehouse-rollout","msg":"multi-warehouse rollout started","warehouses":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"ef-polymer","component":"sales-wms","span":"sales-wms.multi-warehouse-rollout","msg":"rollout complete: system live across multiple warehouses","warehouses":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"ef-polymer","span":"japan.onsite","msg":"on-site with the Japanese team in Japan","location":"Japan","city":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"debug","service":"ef-polymer","span":"japan.onsite","msg":"on-site note: TODO(divy)","location":"Japan"}
+{"ts":"2025-08-01T00:00:00Z","precision":"month","level":"info","service":"euro-tech","span":"euro-tech.go-iam-intern","msg":"joined Euro Technologies as Go/IAM Intern","lang":"go"}
+{"ts":"TODO(divy)","level":"info","service":"euro-tech","span":"euro-tech.go-iam-intern","msg":"started Euro-IAM from scratch: Go, Gin, GORM, Postgres, Redis","lang":"go","stack":"gin,gorm,postgres,redis"}
+{"ts":"2025-11-01T00:00:00Z","precision":"month","level":"info","service":"euro-tech","span":"euro-tech.go-iam-intern","msg":"shipped Euro-IAM: multi-tenant OIDC, WebAuthn, TOTP, magic links, SSO","lang":"go","stack":"gin,gorm,postgres,redis,asynq"}
+{"ts":"TODO(divy)","level":"info","service":"euro-tech","component":"oidc","span":"euro-iam.oidc-core","msg":"OIDC provider core online: multi-tenant issuer backed by Postgres and Redis","lang":"go"}
+{"ts":"TODO(divy)","level":"debug","service":"euro-tech","component":"oidc","span":"euro-iam.oidc-core","msg":"tenant isolation model: TODO(divy) (per-tenant issuer? shared schema?)","lang":"go"}
+{"ts":"TODO(divy)","level":"info","service":"euro-tech","component":"webauthn","span":"euro-iam.webauthn","msg":"WebAuthn registration and login shipped","factor":"webauthn"}
+{"ts":"TODO(divy)","level":"info","service":"euro-tech","component":"webauthn","span":"euro-iam.webauthn","msg":"TOTP, magic links and SSO shipped alongside WebAuthn","factors":"totp,magic-link,sso"}
+{"ts":"TODO(divy)","level":"info","service":"euro-tech","component":"asynq","span":"euro-iam.asynq-workers","msg":"Asynq background workers online on Redis","queue":"asynq"}
+{"ts":"TODO(divy)","level":"debug","service":"euro-tech","component":"asynq","span":"euro-iam.asynq-workers","msg":"jobs running on the workers: TODO(divy)","queue":"asynq"}
+{"ts":"2025-12-01T00:00:00Z","precision":"month","level":"info","service":"gradr","span":"gradr.intern","msg":"joined Gradr as Intern","company":"gradr.se","country":"SE","sector":"edtech"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","span":"gradr.intern","msg":"first feature shipped as intern: TODO(divy)","stack":"TODO(divy)"}
+{"ts":"2026-03-01T00:00:00Z","precision":"month","level":"info","service":"gradr","span":"gradr.product-engineer","msg":"promoted to Product Engineer","from":"intern"}
+{"ts":"2026-03-01T00:00:00Z","precision":"month","level":"info","service":"gradr","span":"gradr.product-engineer","msg":"role: part-time Product Engineer owning production observability and shipping full-stack features","employment":"part-time"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"grafana","span":"gradr.observability","msg":"took ownership of production observability infrastructure on Hetzner","stack":"loki,promtail,prometheus,grafana,sentry,uptime-kuma,caddy,authelia,infisical"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"loki","span":"gradr.observability","msg":"Loki + Promtail log pipeline live","host":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"prometheus","span":"gradr.observability","msg":"Prometheus + Grafana metrics and dashboards live"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"sentry","span":"gradr.observability","msg":"self-hosted Sentry live for error tracking"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"uptime-kuma","span":"gradr.observability","msg":"Uptime Kuma probes live behind Caddy with Authelia and Infisical for secrets","auth":"authelia","secrets":"infisical"}
+{"ts":"TODO(divy)","level":"debug","service":"gradr","component":"caddy","span":"gradr.observability","msg":"Caddy fronts the observability stack with automatic TLS","edge":"caddy"}
+{"ts":"TODO(divy)","level":"error","service":"gradr","component":"secrets-sidecar","span":"gradr.inc-001","msg":"post-reboot race: app containers started before the secrets sidecar wrote .env","incident":"INC-001","trigger":"host-reboot"}
+{"ts":"TODO(divy)","level":"warn","service":"gradr","component":"secrets-sidecar","span":"gradr.inc-001","msg":"post-reboot race: secrets sidecar wrote .env after app containers started; Supabase-backed service down","incident":"INC-001","resolved":true}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"secrets-sidecar","span":"gradr.inc-001","msg":"INC-001 resolved: startup ordering + healthcheck gating deployed","incident":"INC-001","postmortem":"/postmortems/INC-001"}
+{"ts":"TODO(divy)","level":"error","service":"gradr","component":"dev-proxy","span":"gradr.inc-002","msg":"proxy-host memory exhaustion: self-hosted Sentry containers dominating RAM and swap","incident":"INC-002","containers_approx":65}
+{"ts":"TODO(divy)","level":"warn","service":"gradr","component":"dev-proxy","span":"gradr.inc-002","msg":"cascading memory exhaustion: sentry containers saturating swap","incident":"INC-002","containers_approx":65,"resolved":true}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"dev-proxy","span":"gradr.inc-002","msg":"INC-002 resolved: Sentry triaged, profiled and right-sized to an errors-only profile","incident":"INC-002","postmortem":"/postmortems/INC-002"}
+{"ts":"TODO(divy)","level":"error","service":"gradr","component":"sentry","span":"gradr.inc-003","msg":"self-hosted Sentry outbound email failing","incident":"INC-003","channel":"email"}
+{"ts":"TODO(divy)","level":"warn","service":"gradr","component":"sentry","span":"gradr.inc-003","msg":"Sentry alert and invite emails not delivered while the relay was failing","incident":"INC-003","resolved":true}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"sentry","span":"gradr.inc-003","msg":"INC-003 resolved: relay switched to Resend on port 2465, from-address config fixed","incident":"INC-003","relay":"resend","port":2465,"postmortem":"/postmortems/INC-003"}
+{"ts":"TODO(divy)","level":"error","service":"gradr","component":"sentry","span":"gradr.inc-004","msg":"capture gate silently dropping critical infra errors","incident":"INC-004","signal":"dropped"}
+{"ts":"TODO(divy)","level":"warn","service":"gradr","component":"sentry","span":"gradr.inc-004","msg":"unbounded fingerprinting created 1000+ duplicate issues","incident":"INC-004","duplicate_issues":"1000+","resolved":true}
+{"ts":"TODO(divy)","level":"info","service":"gradr","component":"sentry","span":"gradr.inc-004","msg":"INC-004 resolved: capture gate and fingerprinting fixed, alert hygiene applied","incident":"INC-004","postmortem":"/postmortems/INC-004"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","span":"gradr.product-features","msg":"shipping full-stack product features at Gradr","stack":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"gradr","span":"gradr.product-features","msg":"feature shipped: TODO(divy) (sanitized one-liner)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube","msg":"first PR merged in kubernetes/minikube","org":"kubernetes","repo":"kubernetes/minikube"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube","msg":"15+ merged PRs in kubernetes/minikube; CNCF contributor","org":"kubernetes","merged_prs":"15+"}
+{"ts":"TODO(divy)","level":"debug","service":"oss","span":"oss.minikube","msg":"review round-trips with minikube maintainers: TODO(divy)","org":"kubernetes"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-01","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-02","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-03","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-04","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-05","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-06","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-07","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-08","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-09","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-10","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-11","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-12","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-13","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-14","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.minikube.pr-15","msg":"merged: TODO(divy) PR title","repo":"kubernetes/minikube","pr":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.kubeflow","msg":"contributions to Kubeflow","org":"kubeflow"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.kubeflow.contrib-01","msg":"kubeflow contribution: TODO(divy) title","org":"kubeflow","repo":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.kubeflow.contrib-02","msg":"kubeflow contribution: TODO(divy) title","org":"kubeflow","repo":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.lfx-velero-application","msg":"applied to LFX Mentorship 2026 Term 3: Velero — CSI Snapshot E2E tests in Kind CI","program":"lfx","term":"2026-3","project":"velero","status":"pending"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.lfx-velero-application","msg":"also targeting OpenTelemetry for LFX Mentorship","program":"lfx","project":"opentelemetry"}
+{"ts":"TODO(divy)","level":"debug","service":"oss","span":"oss.lfx-velero-application","msg":"lfx_applications{status=\"pending\"} = 1 until a decision lands","metric":"lfx_applications"}
+{"ts":"TODO(divy)","level":"info","service":"oss","span":"oss.wasmedge-prep","msg":"explored the WasmEdge Wide Arithmetic proposal","project":"wasmedge","proposal":"wide-arithmetic"}
+{"ts":"TODO(divy)","level":"debug","service":"oss","span":"oss.wasmedge-prep","msg":"first x86-64 asm routine of the 128-bit arithmetic library compiles","lang":"asm"}
+{"ts":"TODO(divy)","level":"debug","service":"oss","span":"oss.wasmedge-prep","msg":"128-bit arithmetic library in C++/x86-64 built as prep for the proposal","lang":"cpp"}
+{"ts":"TODO(divy)","level":"debug","service":"oss","msg":"exploring Playwright ecosystem contributions","project":"playwright"}
+{"ts":"TODO(divy)","level":"info","service":"project","span":"project.codemind","msg":"CodeMind built for the WeMakeDevs Cognee hackathon: persistent Cognee-powered memory layer for codebases","hackathon":"wemakedevs-cognee"}
+{"ts":"TODO(divy)","level":"debug","service":"project","span":"project.codemind","msg":"CodeMind reads git history to detect contradictory PRs","feature":"contradiction-detection"}
+{"ts":"TODO(divy)","level":"info","service":"project","component":"github-actions","span":"project.codemind","msg":"CodeMind ships GitHub Actions workflows and a CLI","interfaces":"github-actions,cli"}
+{"ts":"TODO(divy)","level":"info","service":"project","component":"pypi","span":"project.codemind","msg":"published codemind-ci 0.2.0 to PyPI","package":"codemind-ci","version":"0.2.0"}
+{"ts":"TODO(divy)","level":"info","service":"project","component":"chrome-extension","span":"project.savely","msg":"Savely launched: Chrome price-comparison extension","stack":"fastapi,svelte,postgres"}
+{"ts":"TODO(divy)","level":"info","service":"project","component":"chrome-extension","span":"project.savely","msg":"Savely passed 5,000 active users","active_users":5000,"source":"TODO(divy)"}
+{"ts":"TODO(divy)","level":"debug","service":"project","component":"chrome-extension","span":"project.savely","msg":"Savely backend: FastAPI on Postgres; extension UI in Svelte","stack":"fastapi,svelte,postgres"}
+{"ts":"TODO(divy)","level":"info","service":"quant","span":"quant.worldquant-iqc","msg":"entered WorldQuant International Quant Championship Stage 1","competition":"worldquant-iqc","stage":1}
+{"ts":"TODO(divy)","level":"info","service":"quant","span":"quant.worldquant-iqc","msg":"2nd Prize in WorldQuant IQC Stage 1, ranked 98 globally","competition":"worldquant-iqc","prize":"2nd","global_rank":98}
+{"ts":"TODO(divy)","level":"debug","service":"quant","span":"quant.worldquant-iqc","msg":"alpha submitted on WorldQuant BRAIN","platform":"brain"}
