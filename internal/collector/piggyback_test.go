@@ -40,6 +40,13 @@ func TestPiggybackSingleFlightAndMinInterval(t *testing.T) {
 	if !p.Kick() {
 		t.Fatal("kick after MinInterval should start a round")
 	}
+	deadline = time.Now().Add(2 * time.Second)
+	for func() bool { p.mu.Lock(); defer p.mu.Unlock(); return p.running }() {
+		if time.Now().After(deadline) {
+			t.Fatal("second round did not finish")
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
 	mu.Lock()
 	defer mu.Unlock()
 	if started != 2 {
