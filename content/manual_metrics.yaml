@@ -1,0 +1,15 @@
+# content/manual_metrics.yaml — hand-maintained gauges (brief §7: "source: manual / last updated").
+# Never round up; write the lower bound you can defend. `updated_at` is YYYY-MM-DD or TODO(divy)
+# (TODO → the panel prints "last updated: unknown").
+metrics:
+  - metric: savely_active_users
+    value: 5000
+    source: TODO(divy)   # Chrome Web Store stats page or internal analytics URL
+    updated_at: TODO(divy)
+    note: "5,000+ per profile; lower bound"
+  - metric: lfx_applications
+    labels: {status: pending}
+    value: 1
+    source: LFX Mentorship 2026 Term 3 application — Velero (CSI Snapshot E2E tests in Kind CI)
+    updated_at: TODO(divy)
+    note: "TODO(divy): set to 2 if the OpenTelemetry application was also submitted; on a decision move the count to status=accepted or status=rejected"

@@ -1,0 +1,35 @@
+# content/alerts.yaml — Prometheus rule file (brief §3.6). Served by GET /api/v1/rules and evaluated
+# client-side every `interval` against /api/v1/query. Must pass `promtool check rules content/alerts.yaml`.
+groups:
+  - name: divy
+    interval: 15s
+    rules:
+      - alert: DivyAvailableForHire
+        expr: divy_open_to_work == 1
+        for: 30s
+        labels:
+          severity: page
+        annotations:
+          summary: "Open to backend/infra internships. Runbook: /contact"
+          runbook_url: /contact
+
+      - alert: HighContributionRate
+        # threshold: TODO(divy) — 20 contributions/week is a placeholder default; change the literal in `expr`
+        # and the `threshold_per_week` label together (`make validate` requires them to match).
+        expr: sum(increase(github_commits_total[7d])) > 20
+        for: 15s
+        labels:
+          severity: info
+          threshold_per_week: "20"
+        annotations:
+          summary: "High contribution rate: {{ $value }} contributions in the last 7 days (threshold {{ $labels.threshold_per_week }})"
+          runbook_url: /dashboard#panel=commits-weekly
+
+      - alert: LFXApplicationPending
+        expr: lfx_applications{status="pending"} > 0
+        for: 0s
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $value }} LFX Mentorship application(s) pending (2026 Term 3 — Velero)"
+          runbook_url: /dashboard#panel=lfx-pending

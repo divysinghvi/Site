@@ -1,0 +1,151 @@
+# content/panels.yaml — the metrics dashboard (brief §3.2). 24-column grid, Grafana-style names.
+# Every `expr` must parse in the supported PromQL subset (docs/promql-subset.md); `make validate` checks it.
+# `hide: true` = the query runs but is not drawn; its latest value feeds the panel (last-updated stamps).
+version: 1
+dashboard:
+  title: Divy — career metrics
+  refresh: 60s
+  time: {default: 1y, options: [24h, 7d, 30d, 1y, all]}
+
+panels:
+  # ---- stat row (y=0) — every number is a query result, never typed ----
+  - id: stat-experience
+    title: Years of experience
+    type: stat
+    gridPos: {x: 0, y: 0, w: 6, h: 4}
+    targets: [{refId: A, expr: divy_experience_years, instant: true}]
+    unit: none
+    decimals: 1
+    description: Years since the earliest dated work span (services flagged counts_as_experience in spans.yaml). Grows every second.
+    source: {kind: content, note: "derived from content/spans.yaml at request time; TODO(divy) start dates are skipped, so today this counts from 2024-05 (EF Polymer) until the freelance span is dated"}
+    options: {graph_mode: none, color_mode: value}
+
+  - id: stat-merged-prs
+    title: Merged PRs
+    type: stat
+    gridPos: {x: 6, y: 0, w: 6, h: 4}
+    targets: [{refId: A, expr: sum(github_merged_prs_total), instant: true}]
+    unit: short
+    decimals: 0
+    description: All merged pull requests authored by divysinghvi across orgs (private orgs are counted, never named).
+    source: {kind: github, cadence: 15m, note: "GitHub search is:pr is:merged author:divysinghvi; cumulative counter backfilled from mergedAt"}
+    options: {graph_mode: area}
+
+  - id: stat-packages
+    title: Packages published
+    type: stat
+    gridPos: {x: 12, y: 0, w: 6, h: 4}
+    targets: [{refId: A, expr: sum(pypi_package_info), instant: true}]
+    unit: short
+    decimals: 0
+    description: Number of packages on PyPI (one pypi_package_info series per package, value 1).
+    source: {kind: pypi, cadence: 60m, note: "pypi.org JSON API"}
+    options: {graph_mode: none}
+
+  - id: stat-active-users
+    title: Active users
+    type: stat
+    gridPos: {x: 18, y: 0, w: 6, h: 4}
+    targets:
+      - {refId: A, expr: savely_active_users, instant: true}
+      - {refId: B, expr: 'divy_manual_metric_updated_timestamp_seconds{metric="savely_active_users"}', instant: true, hide: true}
+    unit: short
+    decimals: 0
+    description: Savely Chrome extension users. Source is manual (lower bound); the panel prints "last updated" from series B, or "unknown" if it is missing.
+    source: {kind: manual, note: "content/manual_metrics.yaml — source: manual / last updated shown on the panel", updated_metric: 'divy_manual_metric_updated_timestamp_seconds{metric="savely_active_users"}'}
+    options: {graph_mode: none, color_mode: value}
+
+  # ---- row 1 (y=4) ----
+  - id: commits-weekly
+    title: GitHub contributions — weekly rate
+    type: timeseries
+    gridPos: {x: 0, y: 4, w: 12, h: 8}
+    targets: [{refId: A, expr: 'sum(increase(github_commits_total[7d]))', legendFormat: contributions / 7d}]
+    unit: short
+    decimals: 0
+    description: github_commits_total counts GitHub contribution-calendar events (commits, PRs, issues, reviews) per day; increase over a 7-day window. Over daily samples Prometheus extrapolation makes this 7/6 of the 6-day increase until intraday samples exist.
+    source: {kind: github, cadence: 15m, note: "contributionsCollection.contributionCalendar, last 365 days, backfilled daily"}
+
+  - id: merged-prs-by-org
+    title: Merged PRs by org
+    type: timeseries
+    gridPos: {x: 12, y: 4, w: 12, h: 8}
+    targets: [{refId: A, expr: github_merged_prs_total, legendFormat: "{{org}}"}]
+    unit: short
+    decimals: 0
+    stack: true
+    description: Cumulative merged PRs per repository owner (kubernetes, kubeflow, gradr — private, count only — and others).
+    source: {kind: github, cadence: 15m, note: "GitHub search is:pr is:merged author:divysinghvi; org = repo owner login"}
+
+  # ---- row 2 (y=12) ----
+  - id: stars-by-repo
+    title: Stars by repo
+    type: bargauge
+    gridPos: {x: 0, y: 12, w: 8, h: 8}
+    targets: [{refId: A, expr: github_stars > 0, legendFormat: "{{repo}}", instant: true}]
+    unit: short
+    decimals: 0
+    description: Current stargazers per public repo with at least one star. No history before the first collection.
+    source: {kind: github, cadence: 15m, note: "gauge; starts at first collection; zero-star repos are stored but filtered here"}
+
+  - id: pypi-downloads
+    title: codemind-ci downloads / day
+    type: timeseries
+    gridPos: {x: 8, y: 12, w: 8, h: 8}
+    targets: [{refId: A, expr: 'rate(pypi_downloads_total{package="codemind-ci"}[2d]) * 86400', legendFormat: downloads / day (2d avg)}]
+    unit: short
+    decimals: 0
+    description: Daily downloads from pypistats.org (mirrors excluded), backfilled for the last 180 days. A 2-day rate window is used because samples are daily and a [1d] window would hold a single sample.
+    source: {kind: pypi, cadence: 60m, note: "pypistats.org overall, mirrors=false"}
+
+  - id: savely-active-users
+    title: Savely active users
+    type: stat
+    gridPos: {x: 16, y: 12, w: 8, h: 8}
+    targets:
+      - {refId: A, expr: savely_active_users, legendFormat: users}
+      - {refId: B, expr: 'divy_manual_metric_updated_timestamp_seconds{metric="savely_active_users"}', instant: true, hide: true}
+    unit: short
+    decimals: 0
+    description: "Manual gauge, lower bound (5,000+). TODO(divy): source URL. The panel shows source: manual and the last-updated date honestly."
+    source: {kind: manual, note: "content/manual_metrics.yaml", updated_metric: 'divy_manual_metric_updated_timestamp_seconds{metric="savely_active_users"}'}
+    options: {graph_mode: area}
+
+  # ---- row 3 (y=20) ----
+  - id: oss-prs-open
+    title: Open OSS PRs
+    type: gauge
+    gridPos: {x: 0, y: 20, w: 8, h: 6}
+    targets: [{refId: A, expr: oss_prs_open, instant: true}]
+    unit: short
+    decimals: 0
+    min: 0
+    max: 10
+    thresholds: {mode: absolute, steps: [{value: null, color: blue}, {value: 1, color: green}]}
+    description: Pull requests currently open in repositories not owned by divysinghvi.
+    source: {kind: github, cadence: 15m, note: "GitHub search is:pr is:open author:divysinghvi -user:divysinghvi"}
+
+  - id: lfx-pending
+    title: LFX applications pending
+    type: gauge
+    gridPos: {x: 8, y: 20, w: 8, h: 6}
+    targets:
+      - {refId: A, expr: 'lfx_applications{status="pending"}', instant: true}
+      - {refId: B, expr: 'divy_manual_metric_updated_timestamp_seconds{metric="lfx_applications"}', instant: true, hide: true}
+    unit: short
+    decimals: 0
+    min: 0
+    max: 3
+    thresholds: {mode: absolute, steps: [{value: null, color: blue}, {value: 1, color: yellow}]}
+    description: LFX Mentorship 2026 Term 3 (Velero — CSI Snapshot E2E tests in Kind CI). Manual; see manual_metrics.yaml.
+    source: {kind: manual, note: "content/manual_metrics.yaml", updated_metric: 'divy_manual_metric_updated_timestamp_seconds{metric="lfx_applications"}'}
+
+  - id: divy-uptime
+    title: API uptime
+    type: stat
+    gridPos: {x: 16, y: 20, w: 8, h: 6}
+    targets: [{refId: A, expr: divy_uptime_seconds, instant: true}]
+    unit: dtdurations
+    description: Process uptime of the API serving this page (divy_uptime_seconds). A joke that is also real.
+    source: {kind: process, note: "seconds since the divy binary started; resets on every cold start"}
+    options: {graph_mode: none}

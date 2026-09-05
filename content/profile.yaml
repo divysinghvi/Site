@@ -1,0 +1,31 @@
+# content/profile.yaml — identity, /healthz payload, /contact runbook, `kubectl get pods` rows.
+name: Divy
+handle: divysinghvi
+tagline: "TODO(divy): one-line tagline (used in <title> and the default OG image)"
+location: Rajasthan, India
+tz: Asia/Kolkata
+open_to_work: true
+open_to: ["backend intern", "infra", "sre"]
+
+links:
+  github: https://github.com/divysinghvi
+  email: TODO(divy)        # mailto:you@example.com
+  linkedin: TODO(divy)
+  resume: TODO(divy)       # /resume.pdf once web/static/resume.pdf exists
+  calendar: TODO(divy)     # calendly-style booking link
+
+escalation:
+  - {step: 1, channel: email, target: TODO(divy), response_time: TODO(divy), note: "preferred for roles and internships (backend / infra / SRE)"}
+  - {step: 2, channel: github, target: https://github.com/divysinghvi, response_time: TODO(divy), note: "open an issue on any repo; PRs welcome"}
+  - {step: 3, channel: linkedin, target: TODO(divy), response_time: TODO(divy)}
+  - {step: 4, channel: calendar, target: TODO(divy), response_time: "next free slot", note: "book directly"}
+
+# `kubectl get pods` in the promql console: NAME READY STATUS RESTARTS AGE NOTE.
+# RESTARTS = postmortems under the pod's span; AGE = now − the span's resolved start.
+pods:
+  - {name: gradr-observability, ready: "1/1", status: Running,   restarts_from: postmortems, span: gradr.observability, note: "Loki, Promtail, Prometheus, Grafana, Sentry, Uptime Kuma, Caddy, Authelia, Infisical on Hetzner"}
+  - {name: savely,              ready: "1/1", status: Running,   restarts_from: none, span: project.savely, note: "5000+ users"}
+  - {name: codemind-ci,         ready: "1/1", status: Running,   restarts_from: none, span: project.codemind, note: "v0.2.0 on PyPI"}
+  - {name: euro-iam,            ready: "0/1", status: Completed, restarts_from: none, span: euro-tech.go-iam-intern, note: "shipped 2025-11: multi-tenant OIDC, WebAuthn, TOTP, magic links, SSO"}
+  - {name: sales-wms,           ready: "0/1", status: Completed, restarts_from: none, span: ef-polymer.swe-intern, note: "deployed across multiple warehouses; TODO(divy): set Running if still in production"}
+  - {name: lfx-velero,          ready: "0/1", status: Pending,   restarts_from: none, span: oss.lfx-velero-application, note: "LFX Mentorship 2026 Term 3 application"}
