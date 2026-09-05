@@ -1,0 +1,433 @@
+# content/spans.yaml — the career trace (brief §3.1).
+# Quote every date ("2024-05", not 2024-05). Month precision is YYYY-MM; unknown = TODO(divy).
+# Children order carries no meaning: the API sorts by resolved start. Run `make validate` after editing.
+version: 1
+
+services:
+  - {id: divy,       title: Divy,               color: "#73bf69"}
+  - {id: edu,        title: Education,          color: "#96d98d"}
+  - {id: freelance,  title: Freelance,          color: "#c7d0d9", counts_as_experience: true}
+  - {id: ef-polymer, title: EF Polymer Ltd.,    color: "#ff9830", counts_as_experience: true}
+  - {id: euro-tech,  title: Euro Technologies,  color: "#b877d9", counts_as_experience: true}
+  - {id: gradr,      title: Gradr,              color: "#5794f2", counts_as_experience: true}
+  - {id: oss,        title: Open source,        color: "#f2cc0c"}
+  - {id: project,    title: Projects,           color: "#8ab8ff"}
+  - {id: quant,      title: Quant,              color: "#ff7383"}
+  - {id: community,  title: Community,          color: "#fade2a"}
+
+trace:
+  id: divy.career
+  service: divy
+  title: Divy — career
+  start: "2023"
+  open: true
+  tags:
+    role: student + part-time product engineer
+    location: "Rajasthan, India"
+    stack: [sveltekit, prisma, python, fastapi, go, docker, caddy, hetzner, postgres, redis, prometheus, loki, grafana, sentry]
+    interests: [x86-64 asm, webassembly, llvm, competitive programming, quant finance]
+    open_to: [backend intern, infra, sre]
+  children:
+
+    # ---------------------------------------------------------------- education
+    - id: edu.btech-ece
+      service: edu
+      title: B.Tech Electronics & Communication Engineering — College of Technology and Engineering, Udaipur
+      start: "2023"
+      end: "2027"            # planned graduation; open: true keeps the bar dashed up to it
+      open: true
+      tags: {role: student, location: "Udaipur, India"}
+      todo:
+        - "TODO(divy): enrolment month and expected graduation month (refines both dates to YYYY-MM)"
+
+    # ---------------------------------------------------------------- freelance
+    - id: freelance.web-dev
+      service: freelance
+      title: Freelance web & app development
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: freelance developer, stack: TODO(divy), lang: TODO(divy), location: "Rajasthan, India"}
+      todo:
+        - "TODO(divy): start/end months (before May 2024), stack, 2–3 sanitized project one-liners (become log lines)"
+
+    # ---------------------------------------------------------------- EF Polymer
+    - id: ef-polymer.swe-intern
+      service: ef-polymer
+      title: Software Engineering Intern — EF Polymer Ltd. (Japanese AgriTech startup)
+      start: "2024-05"
+      end: "2025-07"
+      tags:
+        role: Software Engineering Intern
+        stack: TODO(divy)
+        lang: TODO(divy)
+        location: remote + on-site Japan
+        sector: agritech
+      events:
+        - {ts: TODO(divy), name: first prod deploy, attrs: {system: sales-wms}}
+      todo:
+        - "TODO(divy): SWMS stack and languages; first-deploy month; number of warehouses"
+      children:
+        - id: sales-wms.build
+          service: ef-polymer
+          title: Sales & Warehouse Management System — build
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {role: developer, stack: TODO(divy), lang: TODO(divy)}
+          todo: ["TODO(divy): build months; modules built (sales, inventory, …)"]
+        - id: sales-wms.multi-warehouse-rollout
+          service: ef-polymer
+          title: Sales & Warehouse Management System — multi-warehouse rollout
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {role: developer}
+          events:
+            - {ts: TODO(divy), name: deployed across multiple warehouses, attrs: {warehouses: "TODO(divy)"}}
+          todo: ["TODO(divy): rollout months and warehouse count"]
+        - id: japan.onsite
+          service: ef-polymer
+          title: On-site with the Japanese team
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {location: Japan}
+          todo: ["TODO(divy): city and on-site dates (the collaboration with the team ran 12 months, remote + in person)"]
+
+    # ---------------------------------------------------------------- Euro Technologies
+    - id: euro-tech.go-iam-intern
+      service: euro-tech
+      title: Go/IAM Intern — Euro Technologies
+      start: "2025-08"
+      end: "2025-11"
+      tags:
+        role: Go/IAM Intern
+        stack: [go, gin, gorm, postgres, redis, asynq]
+        lang: [go]
+        location: TODO(divy)
+      events:
+        - {ts: "2025-11", name: shipped Euro-IAM, attrs: {features: "multi-tenant OIDC, WebAuthn, TOTP, magic links, SSO", built: from scratch}}
+      links:
+        - {kind: repo, url: TODO(divy), label: Euro-IAM (if public)}
+      children:
+        - id: euro-iam.oidc-core
+          service: euro-tech
+          title: Euro-IAM — multi-tenant OIDC provider core
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {stack: [go, gin, gorm, postgres, redis], lang: [go]}
+          todo: ["TODO(divy): months; which OIDC flows were implemented"]
+        - id: euro-iam.webauthn
+          service: euro-tech
+          title: Euro-IAM — WebAuthn, TOTP, magic links, SSO
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {stack: [webauthn, totp, magic-links, sso], lang: [go]}
+          todo: ["TODO(divy): months"]
+        - id: euro-iam.asynq-workers
+          service: euro-tech
+          title: Euro-IAM — Asynq background workers
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {stack: [asynq, redis], lang: [go]}
+          todo: ["TODO(divy): months; which jobs run on the workers (mail? token cleanup?)"]
+
+    # ---------------------------------------------------------------- Gradr
+    - id: gradr.intern
+      service: gradr
+      title: Intern — Gradr (gradr.se, Swedish EdTech startup)
+      start: "2025-12"
+      end: "2026-03"
+      tags: {role: Intern, location: TODO(divy), stack: TODO(divy)}
+      todo: ["TODO(divy): remote or on-site; product stack; first shipped feature"]
+
+    - id: gradr.product-engineer
+      service: gradr
+      title: Product Engineer (part-time) — Gradr
+      start: "2026-03"
+      open: true
+      tags: {role: Product Engineer (part-time), location: TODO(divy)}
+      events:
+        - {ts: "2026-03", name: promoted to Product Engineer, attrs: {from: intern}}
+      children:
+        - id: gradr.observability
+          service: gradr
+          title: Production observability infrastructure — owner
+          start: TODO(divy)
+          open: true
+          tags:
+            role: owner
+            stack: [loki, promtail, prometheus, grafana, sentry, uptime-kuma, caddy, authelia, infisical, hetzner]
+          events:
+            - {ts: TODO(divy), name: first prod deploy, attrs: {component: "TODO(divy)"}}
+          todo: ["TODO(divy): month you took ownership of the stack (may predate the promotion)"]
+          children:
+            - id: gradr.inc-001
+              service: gradr
+              title: INC-001 — post-reboot secrets-injection race
+              start: TODO(divy)
+              end: TODO(divy)
+              status: error
+              tags: {component: secrets-sidecar, incident: INC-001}
+              events:
+                - {ts: TODO(divy), name: outage resolved, attrs: {incident: INC-001, fix: startup ordering + healthcheck gating}}
+              links: [{kind: postmortem, ref: INC-001}]
+            - id: gradr.inc-002
+              service: gradr
+              title: INC-002 — cascading memory exhaustion on the proxy host
+              start: TODO(divy)
+              end: TODO(divy)
+              status: error
+              tags: {component: dev-proxy, incident: INC-002}
+              events:
+                - {ts: TODO(divy), name: outage resolved, attrs: {incident: INC-002, fix: sentry right-sized to an errors-only profile}}
+              links: [{kind: postmortem, ref: INC-002}]
+            - id: gradr.inc-003
+              service: gradr
+              title: INC-003 — Sentry outbound email failures
+              start: TODO(divy)
+              end: TODO(divy)
+              status: error
+              tags: {component: sentry, incident: INC-003}
+              events:
+                - {ts: TODO(divy), name: outage resolved, attrs: {incident: INC-003, fix: relay switched to Resend on 2465 + from-address config}}
+              links: [{kind: postmortem, ref: INC-003}]
+            - id: gradr.inc-004
+              service: gradr
+              title: INC-004 — error-tracking signal quality
+              start: TODO(divy)
+              end: TODO(divy)
+              status: error
+              tags: {component: sentry, incident: INC-004}
+              events:
+                - {ts: TODO(divy), name: outage resolved, attrs: {incident: INC-004, fix: capture gate + fingerprinting fixed, alert hygiene}}
+              links: [{kind: postmortem, ref: INC-004}]
+        - id: gradr.product-features
+          service: gradr
+          title: Full-stack product features
+          start: TODO(divy)
+          open: true
+          tags: {stack: TODO(divy)}
+          todo: ["TODO(divy): product stack; 2–3 shipped features (sanitized) as events"]
+
+    # ---------------------------------------------------------------- open source
+    - id: oss.minikube
+      service: oss
+      title: kubernetes/minikube — 15+ merged PRs (CNCF)
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: contributor, org: kubernetes, repo: kubernetes/minikube, lang: TODO(divy)}
+      events:
+        - {ts: TODO(divy), name: first PR merged, attrs: {repo: kubernetes/minikube}}
+      links:
+        - {kind: repo, url: https://github.com/kubernetes/minikube, label: kubernetes/minikube}
+        - {kind: url, url: "https://github.com/kubernetes/minikube/pulls?q=is%3Apr+is%3Amerged+author%3Adivysinghvi", label: merged PRs by divysinghvi}
+      todo:
+        - "TODO(divy): first/last merge months"
+        - "TODO(divy): fill one child per merged PR (15 stubs below; add more to match the real count)"
+      children:
+        - id: oss.minikube.pr-01
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date (start = end = merge day)"]
+        - id: oss.minikube.pr-02
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-03
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-04
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-05
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-06
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-07
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-08
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-09
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-10
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-11
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-12
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-13
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-14
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+        - id: oss.minikube.pr-15
+          service: oss
+          title: "TODO(divy): PR title"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): PR number, title, URL, merge date"]
+
+    - id: oss.kubeflow
+      service: oss
+      title: kubeflow — contributions (CNCF)
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: contributor, org: kubeflow, lang: TODO(divy)}
+      links:
+        - {kind: url, url: https://github.com/kubeflow, label: kubeflow on GitHub}
+      todo: ["TODO(divy): repos, PR/issue links, months; one child per contribution (2 stubs below; add or remove to match)"]
+      children:
+        - id: oss.kubeflow.contrib-01
+          service: oss
+          title: "TODO(divy): contribution title (PR / issue / review)"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {org: kubeflow, repo: TODO(divy), lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): repo, kind, URL, date"]
+        - id: oss.kubeflow.contrib-02
+          service: oss
+          title: "TODO(divy): contribution title (PR / issue / review)"
+          start: TODO(divy)
+          end: TODO(divy)
+          tags: {org: kubeflow, repo: TODO(divy), lang: TODO(divy)}
+          links: [{kind: pr, url: TODO(divy)}]
+          todo: ["TODO(divy): repo, kind, URL, date"]
+
+    - id: oss.lfx-velero-application
+      service: oss
+      title: LFX Mentorship 2026 Term 3 — Velero (CSI Snapshot E2E tests in Kind CI)
+      start: TODO(divy)
+      open: true
+      tags: {role: applicant, project: velero, status: pending, also_targeting: opentelemetry}
+      links:
+        - {kind: url, url: TODO(divy), label: LFX project listing}
+      todo:
+        - "TODO(divy): application month; on a decision set end + open: false + tags.status and update manual_metrics.yaml"
+        - "TODO(divy): was a separate OpenTelemetry application submitted? (then a sibling span + lfx_applications = 2)"
+
+    - id: oss.wasmedge-prep
+      service: oss
+      title: WasmEdge Wide Arithmetic proposal — prep (128-bit arithmetic library, C++/x86-64)
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: explorer, lang: [cpp, x86-64-asm], stack: [wasmedge, webassembly]}
+      links: [{kind: repo, url: TODO(divy), label: 128-bit arithmetic library}]
+      todo: ["TODO(divy): months; library repo URL; was a WasmEdge PR/issue opened?"]
+
+    # ---------------------------------------------------------------- projects
+    - id: project.codemind
+      service: project
+      title: CodeMind — persistent Cognee-powered memory layer for codebases (codemind-ci)
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: author, stack: [python, cognee, github-actions, pypi], lang: [python], hackathon: WeMakeDevs Cognee hackathon}
+      events:
+        - {ts: TODO(divy), name: submitted to the WeMakeDevs Cognee hackathon, attrs: {result: "TODO(divy)"}}
+        - {ts: TODO(divy), name: published codemind-ci 0.2.0 to PyPI, attrs: {package: codemind-ci, version: 0.2.0}}
+      links:
+        - {kind: pypi, url: https://pypi.org/project/codemind-ci/, label: codemind-ci on PyPI}
+        - {kind: repo, url: TODO(divy), label: source}
+        - {kind: url, url: TODO(divy), label: demo}
+      todo: ["TODO(divy): hackathon month and result; repo and demo URLs (demo URL is also uptime target codemind-demo)"]
+
+    - id: project.savely
+      service: project
+      title: Savely — Chrome price-comparison extension
+      start: TODO(divy)
+      open: true
+      tags: {role: author, stack: [fastapi, svelte, postgres, chrome-extension], lang: "TODO(divy): python + javascript/typescript (Svelte side)", users: "5000+"}
+      events:
+        - {ts: TODO(divy), name: 5,000+ active users, attrs: {users: 5000, note: lower bound}}
+      links:
+        - {kind: url, url: TODO(divy), label: landing page}
+        - {kind: url, url: TODO(divy), label: Chrome Web Store listing}
+      todo: ["TODO(divy): launch month; still maintained? (else set end and open: false); user-count source"]
+
+    # ---------------------------------------------------------------- quant
+    - id: quant.worldquant-iqc
+      service: quant
+      title: WorldQuant International Quant Championship — Stage 1
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: participant, result: 2nd Prize, global_rank: 98, platform: WorldQuant BRAIN}
+      events:
+        - {ts: TODO(divy), name: 2nd Prize — Stage 1, attrs: {global_rank: 98}}
+      todo: ["TODO(divy): competition months; prize announcement date; certificate/announcement URL"]
