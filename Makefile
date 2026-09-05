@@ -120,7 +120,7 @@ vercel-build: ## two-pass Vercel build: binary → prerender web → final binar
 	if [ -d web ] && [ -f web/package.json ]; then $(MAKE) web-build; else echo "web/ not present: building the API without an embedded site"; fi
 	go build $(GOFLAGS) -ldflags "$(LDFLAGS)" -o "$${VERCEL_OUTPUT_FILE:-bin/divy}" ./cmd/api
 
-docker: ## build the container image (deploy/Dockerfile lands in Phase 5)
+docker: ## build the container image from deploy/Dockerfile (multi-stage → distroless)
 	docker build -f deploy/Dockerfile --build-arg VERSION=$(VERSION) --build-arg COMMIT=$(COMMIT) -t $(IMAGE):$(VERSION) -t $(IMAGE):latest .
 
 ascii: ## print the ASCII career trace

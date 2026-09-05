@@ -300,7 +300,8 @@ class AlertEngine {
 			const d = res.data;
 			const samples: AlertSample[] = [];
 			if (d.resultType === 'vector') {
-				for (const s of d.result) samples.push({ labels: s.metric, value: sampleValue(s.value[1]) });
+				for (const s of d.result)
+					samples.push({ labels: s.metric, value: sampleValue(s.value[1]) });
 			} else if (d.resultType === 'scalar') {
 				const v = sampleValue(d.result[1]);
 				if (v !== 0 && !Number.isNaN(v)) samples.push({ labels: {}, value: v });

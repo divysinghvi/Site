@@ -14,7 +14,7 @@
 	--border: #2c3235;
 	--fg: #d8d9da;
 	--fg-muted: #a1a8b0;
-	--fg-dim: #7b838d;
+	--fg-dim: #939ba4;
 	--green: #73bf69;
 	--yellow: #f2cc0c;
 	--red: #f2495c;
@@ -22,6 +22,7 @@
 	--orange: #ff9830;
 	--purple: #b877d9;
 	--link: #6e9fff;
+	--primary: #3b6fd6;
 	--focus: #5794f2;
 	--selection: rgba(87, 148, 242, 0.18);
 	--hatch: rgba(255, 255, 255, 0.08);
@@ -36,7 +37,7 @@
 	--border: #d3d6da;
 	--fg: #1f2226;
 	--fg-muted: #545b63;
-	--fg-dim: #6f7780;
+	--fg-dim: #5f6770;
 	--green: #3d8a35;
 	--yellow: #a67c00;
 	--red: #cf2b3b;
@@ -44,6 +45,7 @@
 	--orange: #bf5f12;
 	--purple: #8a4fb3;
 	--link: #2456b3;
+	--primary: #2456b3;
 	--focus: #2f66c9;
 	--selection: rgba(47, 102, 201, 0.14);
 	--hatch: rgba(0, 0, 0, 0.08);
@@ -59,7 +61,7 @@
 	--border: #2a3e58;
 	--fg: #d8e0ea;
 	--fg-muted: #a3b3c6;
-	--fg-dim: #7488a0;
+	--fg-dim: #8fa2b8;
 	--green: #7eb26d;
 	--yellow: #eab839;
 	--red: #e24d42;
@@ -67,6 +69,7 @@
 	--orange: #ef843c;
 	--purple: #ba43a9;
 	--link: #33b5e5;
+	--primary: #2c7cb0;
 	--focus: #33b5e5;
 	--selection: rgba(51, 181, 229, 0.18);
 	--hatch: rgba(255, 255, 255, 0.08);
@@ -136,12 +139,23 @@ body {
 ::selection {
 	background: var(--selection);
 }
+/* Links in running text are underlined (WCAG 1.4.1: colour alone must not carry the link). */
 a {
 	color: var(--link);
+	text-decoration: underline;
+	text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
 	text-underline-offset: 2px;
 }
 a:hover {
 	text-decoration: underline;
+	text-decoration-color: currentColor;
+}
+a.btn,
+a.tab,
+a.brand,
+a.chip,
+nav a {
+	text-decoration: none;
 }
 code,
 kbd,
@@ -164,14 +178,15 @@ kbd {
 	text-align: center;
 }
 
-/* Touch: every control is at least 44 px tall (brief §7: mobile first). */
+/* Touch: every control is at least 44 px tall (brief §7: mobile first). !important beats
+   the component-scoped `.btn.small` sizes on purpose: the tap target is not negotiable. */
 @media (pointer: coarse) {
 	.btn,
 	.input,
 	select.input,
 	button.chip,
 	.tab {
-		min-height: 2.75rem;
+		min-height: 2.75rem !important;
 	}
 	.btn {
 		min-width: 2.75rem;
@@ -336,14 +351,15 @@ kbd {
 	opacity: 0.5;
 	cursor: default;
 }
+/* --primary is the palette blue deepened until white text reaches 4.5:1 (axe color-contrast). */
 .btn-primary {
-	background: var(--blue);
-	border-color: var(--blue);
+	background: var(--primary);
+	border-color: var(--primary);
 	color: #fff;
 }
 .btn-primary:hover {
 	filter: brightness(1.1);
-	background: var(--blue);
+	background: var(--primary);
 }
 .input {
 	min-height: 2rem;

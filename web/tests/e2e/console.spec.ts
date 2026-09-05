@@ -41,7 +41,9 @@ test.describe('promql console', () => {
 		await page.keyboard.press('Enter');
 		const table = dialog.getByRole('table').last();
 		await expect(table).toBeVisible({ timeout: 10_000 });
-		await expect(table.locator('thead')).toHaveText(/NAME\s*READY\s*STATUS\s*RESTARTS\s*AGE\s*NOTE/);
+		await expect(table.locator('thead')).toHaveText(
+			/NAME\s*READY\s*STATUS\s*RESTARTS\s*AGE\s*NOTE/
+		);
 		const rows = table.locator('tbody tr');
 		expect(await rows.count()).toBeGreaterThanOrEqual(3);
 		await expect(table).toContainText('gradr-observability');
@@ -66,7 +68,9 @@ test.describe('promql console', () => {
 		);
 		await input.fill('kubectl delete pods savely');
 		await page.keyboard.press('Enter');
-		await expect(dialog.getByRole('alert').last()).toContainText('unknown command "delete" for "kubectl"');
+		await expect(dialog.getByRole('alert').last()).toContainText(
+			'unknown command "delete" for "kubectl"'
+		);
 		await input.fill('help');
 		await page.keyboard.press('Enter');
 		await expect(dialog).toContainText('kubectl get pods');
@@ -137,17 +141,33 @@ test.describe('konami theme', () => {
 });
 
 test.describe('meta', () => {
-	for (const path of ['/', '/dashboard', '/logs', '/uptime', '/postmortems', '/alerts', '/contact', '/explore']) {
+	for (const path of [
+		'/',
+		'/dashboard',
+		'/logs',
+		'/uptime',
+		'/postmortems',
+		'/alerts',
+		'/contact',
+		'/explore'
+	]) {
 		test(`${path} has favicon, theme-color and OG/Twitter tags`, async ({ page }) => {
 			await page.goto(path);
-			await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/favicon.svg');
+			// SvelteKit's client absolutizes the icon href after hydration (relative asset paths)
+			await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', /(^|\/)favicon\.svg$/);
 			await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', /^#/);
 			await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /.+/);
-			await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', /.+/);
+			await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
+				'content',
+				/.+/
+			);
 			await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', /summary/);
 			const image = page.locator('meta[property="og:image"]');
 			if ((await image.count()) > 0)
-				await expect(image.first()).toHaveAttribute('content', /\/og\/(default|postmortems\/INC-\d+)\.png$/);
+				await expect(image.first()).toHaveAttribute(
+					'content',
+					/\/og\/(default|postmortems\/INC-\d+)\.png$/
+				);
 		});
 	}
 });

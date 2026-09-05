@@ -126,10 +126,20 @@
 		if (d.resultType === 'matrix')
 			for (const s of d.result)
 				for (const [t, v] of s.values)
-					points.push({ key: formatStreamLabels(s.metric) + t, series: formatStreamLabels(s.metric), ts: t, value: lokiValue(v) });
+					points.push({
+						key: formatStreamLabels(s.metric) + t,
+						series: formatStreamLabels(s.metric),
+						ts: t,
+						value: lokiValue(v)
+					});
 		if (d.resultType === 'vector')
 			for (const s of d.result)
-				points.push({ key: formatStreamLabels(s.metric), series: formatStreamLabels(s.metric), ts: s.value[0], value: lokiValue(s.value[1]) });
+				points.push({
+					key: formatStreamLabels(s.metric),
+					series: formatStreamLabels(s.metric),
+					ts: s.value[0],
+					value: lokiValue(s.value[1])
+				});
 		lokiResult = {
 			query: q,
 			kind: d.resultType,
@@ -168,6 +178,9 @@
 	let origin = $derived(
 		data.siteOrigin || (typeof location !== 'undefined' ? location.origin : '')
 	);
+	// the preset the last run used (the picker effect re-runs on a change)
+	// svelte-ignore state_referenced_locally
+	let lastPreset: Preset = preset;
 
 	function currentRange(): ResolvedRange {
 		if (customFrom !== undefined && customTo !== undefined && customTo > customFrom) {
@@ -183,6 +196,8 @@
 		instant = q.get('instant') === '1';
 		const from = q.get('from');
 		const to = q.get('to');
+		// the log lines span the whole career: Loki defaults to `all`, Prometheus to 7d
+		if (ds === 'loki' && !from) preset = 'all';
 		const p = presetFromParams(from, to);
 		if (p) {
 			preset = p;
@@ -266,6 +281,7 @@
 
 	onMount(() => {
 		readParams();
+		lastPreset = preset;
 		hydrated = true;
 		if (ds === 'loki') void loadLokiMeta();
 		void labelValues('__name__')
@@ -289,8 +305,6 @@
 	});
 
 	// picker change → re-run when there is a query
-	// svelte-ignore state_referenced_locally
-	let lastPreset = preset;
 	$effect(() => {
 		const p = preset;
 		if (!hydrated || p === lastPreset) return;
@@ -309,6 +323,7 @@
 		result = null;
 		lokiResult = null;
 		if (next === 'loki') {
+			if (customFrom === undefined) preset = lastPreset = 'all';
 			void loadLokiMeta();
 			void run();
 		} else writeParams();
@@ -469,8 +484,9 @@
 					<button type="submit" class="btn btn-primary run" disabled={running}>
 						{running ? 'Running…' : 'Run query'}
 					</button>
-					<a class="btn logs-link" href="/logs?q={encodeURIComponent(expr.trim() || DEFAULT_SELECTOR)}"
-						>Open in Logs ↗</a
+					<a
+						class="btn logs-link"
+						href="/logs?q={encodeURIComponent(expr.trim() || DEFAULT_SELECTOR)}">Open in Logs ↗</a
 					>
 				</div>
 			</form>
@@ -486,7 +502,9 @@
 						<ul class="examples">
 							{#each lokiExamples as q (q)}
 								<li>
-									<button type="button" class="ex mono" onclick={() => void useExample(q)}>{q}</button>
+									<button type="button" class="ex mono" onclick={() => void useExample(q)}
+										>{q}</button
+									>
 								</li>
 							{/each}
 						</ul>
@@ -505,7 +523,10 @@
 						emptyText="No lines matched {lokiResult.query} in this range."
 					/>
 				{:else if lokiResult.points.length === 0}
-					<EmptyState message="The metric query returned no series in this range." expr={lokiResult.query} />
+					<EmptyState
+						message="The metric query returned no series in this range."
+						expr={lokiResult.query}
+					/>
 				{:else}
 					<div class="res-head">
 						<span class="mono dim">{lokiResult.kind} · {lokiResult.points.length} points</span>
@@ -513,14 +534,20 @@
 					<div class="table-wrap">
 						<table class="table mono">
 							<thead>
-								<tr><th scope="col">Series</th><th scope="col">Time</th><th scope="col" class="num">Value</th></tr>
+								<tr
+									><th scope="col">Series</th><th scope="col">Time</th><th scope="col" class="num"
+										>Value</th
+									></tr
+								>
 							</thead>
 							<tbody>
 								{#each lokiResult.points as r (r.key)}
 									<tr>
 										<td class="series">{r.series}</td>
 										<td class="dim">{new Date(r.ts * 1000).toISOString()}</td>
-										<td class="num">{Number.isInteger(r.value) ? r.value : r.value.toPrecision(6)}</td>
+										<td class="num"
+											>{Number.isInteger(r.value) ? r.value : r.value.toPrecision(6)}</td
+										>
 									</tr>
 								{/each}
 							</tbody>

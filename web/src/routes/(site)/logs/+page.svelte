@@ -113,7 +113,14 @@
 		typed: Record<string, number>;
 		total: number;
 	}
-	let tail = $state<Tail>({ active: false, paused: false, done: false, rows: [], typed: {}, total: 0 });
+	let tail = $state<Tail>({
+		active: false,
+		paused: false,
+		done: false,
+		rows: [],
+		typed: {},
+		total: 0
+	});
 	let tailSource: LogRow[] = [];
 	let tailIdx = 0;
 	let tailTimer: ReturnType<typeof setTimeout> | undefined;
@@ -298,7 +305,14 @@
 			};
 			return;
 		}
-		tail = { active: true, paused: false, done: false, rows: [], typed: {}, total: tailSource.length };
+		tail = {
+			active: true,
+			paused: false,
+			done: false,
+			rows: [],
+			typed: {},
+			total: tailSource.length
+		};
 		tailStep();
 	}
 
@@ -343,7 +357,8 @@
 
 	function stopTail() {
 		clearTimeout(tailTimer);
-		if (tail.active) tail = { active: false, paused: false, done: false, rows: [], typed: {}, total: 0 };
+		if (tail.active)
+			tail = { active: false, paused: false, done: false, rows: [], typed: {}, total: 0 };
 	}
 
 	function toggleTail() {
@@ -420,9 +435,19 @@
 		const out: { key: string; series: string; ts: number; value: number }[] = [];
 		for (const s of result.matrix)
 			for (const [t, v] of s.values)
-				out.push({ key: formatStreamLabels(s.metric) + t, series: formatStreamLabels(s.metric), ts: t, value: lokiValue(v) });
+				out.push({
+					key: formatStreamLabels(s.metric) + t,
+					series: formatStreamLabels(s.metric),
+					ts: t,
+					value: lokiValue(v)
+				});
 		for (const s of result.vector)
-			out.push({ key: formatStreamLabels(s.metric), series: formatStreamLabels(s.metric), ts: s.value[0], value: lokiValue(s.value[1]) });
+			out.push({
+				key: formatStreamLabels(s.metric),
+				series: formatStreamLabels(s.metric),
+				ts: s.value[0],
+				value: lokiValue(s.value[1])
+			});
 		return out;
 	});
 </script>
@@ -437,7 +462,9 @@
 <div class="logs" class:tailing={tail.active}>
 	<header class="head">
 		<h1 class="h1">Logs</h1>
-		<span class="dim mono">{data.services.length} services · {data.labels.join(', ')} labels · content/logs.ndjson via /loki/api/v1</span>
+		<span class="dim mono"
+			>{data.services.length} services · {data.labels.join(', ')} labels · content/logs.ndjson via /loki/api/v1</span
+		>
 	</header>
 
 	<form
@@ -464,7 +491,12 @@
 			<TimeRangePicker bind:value={preset} options={ALL_PRESETS} />
 			<label class="limit mono">
 				<span class="dim">limit</span>
-				<select class="input" bind:value={limit} onchange={() => void run()} aria-label="Line limit">
+				<select
+					class="input"
+					bind:value={limit}
+					onchange={() => void run()}
+					aria-label="Line limit"
+				>
 					{#each LIMITS as l (l)}
 						<option value={l}>{l}</option>
 					{/each}
@@ -481,13 +513,17 @@
 				onclick={toggleTail}
 				title="Replay the matching lines oldest → newest"
 			>
-				<span class="live-dot" class:on={tail.active && !tail.paused && !tail.done} aria-hidden="true"
+				<span
+					class="live-dot"
+					class:on={tail.active && !tail.paused && !tail.done}
+					aria-hidden="true"
 				></span>
 				{tail.active ? 'Stop tail' : 'Live tail'}
 			</button>
 		</div>
 		<p class="kbd-hint mono">
-			<kbd>/</kbd> focus · <kbd>Enter</kbd> run · <kbd>Esc</kbd> clear · <kbd>j</kbd>/<kbd>k</kbd> move ·
+			<kbd>/</kbd> focus · <kbd>Enter</kbd> run · <kbd>Esc</kbd> clear · <kbd>j</kbd>/<kbd>k</kbd>
+			move ·
 			<kbd>Ctrl</kbd>+<kbd>Space</kbd> suggest
 		</p>
 	</form>
@@ -513,11 +549,16 @@
 					<span class="dim">of {result.scanned} scanned · newest first</span>
 				</span>
 			{:else}
-				<span><strong>{matrixRows.length}</strong> points · {result.kind}{#if result.step} · step {humanStep(result.step)}{/if}</span>
+				<span
+					><strong>{matrixRows.length}</strong> points · {result.kind}{#if result.step}
+						· step {humanStep(result.step)}{/if}</span
+				>
 			{/if}
 			<span class="dim">
 				{iso(result.range.from)} → {iso(result.range.to)}
-				· {result.fetchedAt === 'build' ? 'prerendered at build' : `fetched ${hhmmss(result.fetchedAt)}`}
+				· {result.fetchedAt === 'build'
+					? 'prerendered at build'
+					: `fetched ${hhmmss(result.fetchedAt)}`}
 			</span>
 		</div>
 
@@ -556,7 +597,8 @@
 					<ul class="examples">
 						{#each exampleQueries as q (q)}
 							<li>
-								<button type="button" class="ex mono" onclick={() => void useExample(q)}>{q}</button>
+								<button type="button" class="ex mono" onclick={() => void useExample(q)}>{q}</button
+								>
 							</li>
 						{/each}
 					</ul>
@@ -571,7 +613,11 @@
 			<div class="table-wrap">
 				<table class="table mono">
 					<thead>
-						<tr><th scope="col">Series</th><th scope="col">Time</th><th scope="col" class="num">Value</th></tr>
+						<tr
+							><th scope="col">Series</th><th scope="col">Time</th><th scope="col" class="num"
+								>Value</th
+							></tr
+						>
 					</thead>
 					<tbody>
 						{#each matrixRows as r (r.key)}

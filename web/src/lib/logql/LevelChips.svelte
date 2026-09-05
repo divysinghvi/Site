@@ -101,7 +101,7 @@
 	.count {
 		padding-left: 0.1rem;
 		font-size: 0.68rem;
-		color: var(--fg-dim);
+		color: var(--fg-muted);
 	}
 	@media (pointer: coarse) {
 		.chip {

@@ -2,7 +2,7 @@
 
 A working observability stack whose only monitored service is a person. Metrics, logs, traces, uptime, alerts and postmortems about Divy's career — served by one Go binary that speaks the real protocols, so the same URL is a Prometheus data source, a Loki data source and a Jaeger-shaped trace API.
 
-Live: `https://<project>.vercel.app` (replace with the Vercel project URL; `SITE_ORIGIN` configures it).
+Live: https://websites-alpha-indol.vercel.app
 
 Nothing is faked. A number that has no source yet is a `TODO(divy)` in `content/`, a manual metric is labelled `source: manual` with its last-updated date, and an empty panel names the source that is missing.
 
@@ -23,8 +23,8 @@ make dev                          # API on :8080 with --collect, Vite on :5173 (
 
 ## Add it as a Prometheus and Loki data source in your Grafana
 
-1. Connections → Data sources → Add new data source → **Prometheus**. URL: `https://<project>.vercel.app`. Leave server access (proxy) mode; no auth. Save & test — Grafana calls `/api/v1/status/buildinfo` and `query=1+1`.
-2. Add another → **Loki**. URL: `https://<project>.vercel.app`. Save & test — Grafana calls `/loki/api/v1/labels`.
+1. Connections → Data sources → Add new data source → **Prometheus**. URL: `https://websites-alpha-indol.vercel.app`. Leave server access (proxy) mode; no auth. Save & test — Grafana calls `/api/v1/status/buildinfo` and `query=1+1`.
+2. Add another → **Loki**. URL: `https://websites-alpha-indol.vercel.app`. Save & test — Grafana calls `/loki/api/v1/labels`.
 3. Explore: `rate(github_commits_total[7d]) * 86400`, `{service="gradr"} |= "promoted"`, `sum by (org) (increase(github_merged_prs_total[365d]))`. The supported subsets are exact: [docs/promql-subset.md](docs/promql-subset.md), [docs/logql-subset.md](docs/logql-subset.md).
 
 Grafana in browser access mode needs `CORS_ORIGINS=https://your-grafana` on the server.
@@ -32,7 +32,7 @@ Grafana in browser access mode needs `CORS_ORIGINS=https://your-grafana` on the 
 ## curl
 
 ```sh
-B=https://<project>.vercel.app
+B=https://websites-alpha-indol.vercel.app
 curl -s $B/metrics | promtool check metrics                 # a real exposition; passes
 curl -s $B/healthz                                          # {"status":"ok","open_to":["backend intern","infra","sre"],"tz":"Asia/Kolkata"}
 curl -s -H 'Accept: text/plain' $B/                         # the career as an ASCII trace waterfall
@@ -49,7 +49,7 @@ Every response — HTML, assets, API, 304, 404, 429 — carries `X-Divy-Trace-Id
 
 1. Import the repository. Framework Preset **Go**, Root Directory = repository root. `vercel.json` sets the build command (`deploy/vercel-build.sh`: build the API, prerender the SvelteKit app against it, build the final binary with the site embedded) and a daily `/api/collect` cron.
 2. Storage → Marketplace → **Turso Cloud**: the integration injects `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. Without them the function keeps its samples in `/tmp` and loses them with the instance (`/readyz` says `storage: ephemeral`).
-3. Environment variables: `SITE_ORIGIN=https://<project>.vercel.app`, `DIVY_COLLECT_TOKEN` (`openssl rand -hex 32`), `CRON_SECRET` (Vercel Cron sends it as the bearer token), `DIVY_GITHUB_TOKEN` (classic PAT, `repo` + `read:user`, or `public_repo` for public data only). Everything else in `.env.example` has a safe default.
+3. Environment variables: `SITE_ORIGIN=https://websites-alpha-indol.vercel.app`, `DIVY_COLLECT_TOKEN` (`openssl rand -hex 32`), `CRON_SECRET` (Vercel Cron sends it as the bearer token), `DIVY_GITHUB_TOKEN` (classic PAT, `repo` + `read:user`, or `public_repo` for public data only). Everything else in `.env.example` has a safe default.
 4. Repository secrets `SITE_ORIGIN` and `DIVY_COLLECT_TOKEN`: `.github/workflows/collect.yml` calls `POST $SITE_ORIGIN/api/collect` every 5 minutes (probes, GitHub, PyPI, manual, retention — each collector only when it is due). Without the secrets the workflow skips.
 5. Push. Deploys go through Vercel's Git integration; CI (`.github/workflows/ci.yml`) lints, tests, validates content, checks generated files, runs `promtool check metrics` against a live binary, builds the site the way Vercel does and builds the Docker image.
 

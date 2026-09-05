@@ -19,11 +19,18 @@
 
 	let rules = $derived(
 		[...alerts.rules].sort(
-			(a, b) => ORDER.indexOf(a.state) - ORDER.indexOf(b.state) || a.def.name.localeCompare(b.def.name)
+			(a, b) =>
+				ORDER.indexOf(a.state) - ORDER.indexOf(b.state) || a.def.name.localeCompare(b.def.name)
 		)
 	);
 	let counts = $derived.by(() => {
-		const c: Record<AlertState, number> = { firing: 0, pending: 0, inactive: 0, nodata: 0, error: 0 };
+		const c: Record<AlertState, number> = {
+			firing: 0,
+			pending: 0,
+			inactive: 0,
+			nodata: 0,
+			error: 0
+		};
 		for (const r of alerts.rules) c[r.state]++;
 		return c;
 	});
@@ -124,7 +131,9 @@
 					<span class="badge mono state-{r.state}" data-badge>{stateLabel(r.state)}</span>
 					<h2 id="rule-{r.def.name}" class="name mono">{r.def.name}</h2>
 					{#if r.def.labels.severity}
-						<span class="chip sev sev-{r.def.labels.severity}">severity={r.def.labels.severity}</span>
+						<span class="chip sev sev-{r.def.labels.severity}"
+							>severity={r.def.labels.severity}</span
+						>
 					{/if}
 					<span class="chip">for {forText(r)}</span>
 					{#if r.silenced}
@@ -176,8 +185,8 @@
 					{:else if r.state === 'nodata'}
 						<dt>no data</dt>
 						<dd class="nodata">
-							{r.reason ?? `${r.missing.join(', ')}: no series`} — the rule cannot fire until the
-							series exists.
+							{r.reason ?? `${r.missing.join(', ')}: no series`} — the rule cannot fire until the series
+							exists.
 						</dd>
 					{:else if r.state === 'error'}
 						<dt>error</dt>
@@ -223,8 +232,8 @@
 	</section>
 
 	<p class="note dim">
-		The API serves the rules (<a href="/api/v1/rules" rel="external" class="mono">/api/v1/rules</a
-		>) and never evaluates them; every state above comes from this page polling
+		The API serves the rules (<a href="/api/v1/rules" rel="external" class="mono">/api/v1/rules</a>)
+		and never evaluates them; every state above comes from this page polling
 		<span class="mono">/api/v1/query</span>. A firing rule slides in as a toast on every route;
 		Silence hides it until the tab is closed.
 	</p>
@@ -337,6 +346,9 @@
 		font-size: 0.9rem;
 		font-weight: 600;
 		overflow-wrap: anywhere;
+	}
+	.chip.sev {
+		background: var(--bg);
 	}
 	.sev-page,
 	.sev-critical {

@@ -61,9 +61,17 @@ async function kubectl(args: string[]): Promise<Output[]> {
 			}
 		];
 	}
-	if (!resource) return [{ kind: 'error', text: 'error: You must specify the type of resource to get. Use "kubectl api-resources" for a complete list of supported resources.' }];
+	if (!resource)
+		return [
+			{
+				kind: 'error',
+				text: 'error: You must specify the type of resource to get. Use "kubectl api-resources" for a complete list of supported resources.'
+			}
+		];
 	if (!POD_ALIASES.has(resource)) {
-		return [{ kind: 'error', text: `error: the server doesn't have a resource type "${resource}"` }];
+		return [
+			{ kind: 'error', text: `error: the server doesn't have a resource type "${resource}"` }
+		];
 	}
 	const profile = await api.content.profile();
 	const rows = profile.pods.map((p) => [
@@ -99,10 +107,13 @@ function labelColumns(sets: Record<string, string>[]): string[] {
 async function promql(expr: string): Promise<Output[]> {
 	const res = await query(expr);
 	const d = res.data;
-	const warn: Output[] = res.warnings.length ? [{ kind: 'text', text: 'warning: ' + res.warnings.join('; ') }] : [];
+	const warn: Output[] = res.warnings.length
+		? [{ kind: 'text', text: 'warning: ' + res.warnings.join('; ') }]
+		: [];
 	switch (d.resultType) {
 		case 'vector': {
-			if (d.result.length === 0) return [...warn, { kind: 'text', text: 'empty result (no series matched)' }];
+			if (d.result.length === 0)
+				return [...warn, { kind: 'text', text: 'empty result (no series matched)' }];
 			const cols = labelColumns(d.result.map((s) => s.metric));
 			return [
 				...warn,
@@ -111,13 +122,17 @@ async function promql(expr: string): Promise<Output[]> {
 					caption: `vector · ${d.result.length} series · @${new Date(d.result[0]!.value[0] * 1000).toISOString()}`,
 					table: {
 						columns: [...cols, 'VALUE'],
-						rows: d.result.map((s) => [...cols.map((c) => s.metric[c] ?? ''), fmt(sampleValue(s.value[1]))])
+						rows: d.result.map((s) => [
+							...cols.map((c) => s.metric[c] ?? ''),
+							fmt(sampleValue(s.value[1]))
+						])
 					}
 				}
 			];
 		}
 		case 'matrix': {
-			if (d.result.length === 0) return [...warn, { kind: 'text', text: 'empty result (no series matched)' }];
+			if (d.result.length === 0)
+				return [...warn, { kind: 'text', text: 'empty result (no series matched)' }];
 			const cols = labelColumns(d.result.map((s) => s.metric));
 			return [
 				...warn,
@@ -139,9 +154,19 @@ async function promql(expr: string): Promise<Output[]> {
 			];
 		}
 		case 'scalar':
-			return [...warn, { kind: 'table', caption: 'scalar', table: { columns: ['VALUE'], rows: [[fmt(sampleValue(d.result[1]))]] } }];
+			return [
+				...warn,
+				{
+					kind: 'table',
+					caption: 'scalar',
+					table: { columns: ['VALUE'], rows: [[fmt(sampleValue(d.result[1]))]] }
+				}
+			];
 		case 'string':
-			return [...warn, { kind: 'table', caption: 'string', table: { columns: ['VALUE'], rows: [[d.result[1]]] } }];
+			return [
+				...warn,
+				{ kind: 'table', caption: 'string', table: { columns: ['VALUE'], rows: [[d.result[1]]] } }
+			];
 	}
 }
 

@@ -29,7 +29,20 @@
 		return max > 0 ? (n / max) * (height - 4) : 0;
 	}
 
-	const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	const MONTHS = [
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec'
+	];
 	function tickLabel(ts: number): string {
 		const d = new Date(ts * 1000);
 		if (span > 400 * 86400) return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
@@ -61,9 +74,16 @@
 		<span class="dim">volume by level</span>
 		{#if volume}
 			{#each volume.levels as l (l)}
-				<span class="lg"><span class="sw" style="background: {levelVar(l)}"></span>{l} {volume.totals[l] ?? 0}</span>
+				<span class="lg"
+					><span class="sw" style="background: {levelVar(l)}"></span>{l}
+					{volume.totals[l] ?? 0}</span
+				>
 			{/each}
-			<span class="dim">· bucket {volume.step >= 86400 ? `${volume.step / 86400}d` : `${volume.step / 3600}h`}</span>
+			<span class="dim"
+				>· bucket {volume.step >= 86400
+					? `${volume.step / 86400}d`
+					: `${volume.step / 3600}h`}</span
+			>
 		{:else}
 			<span class="dim">no histogram (metric query or no result)</span>
 		{/if}

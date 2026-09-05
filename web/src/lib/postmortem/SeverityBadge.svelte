@@ -62,7 +62,8 @@
 		align-items: center;
 		border-radius: 4px;
 		border: 1px solid var(--c);
-		background: color-mix(in srgb, var(--c) 18%, transparent);
+		/* a 10% tint over the page background keeps the coloured text at ≥ 4.5:1 (axe) */
+		background: color-mix(in srgb, var(--c) 10%, var(--bg));
 		color: var(--c);
 		font-weight: 700;
 		letter-spacing: 0.04em;

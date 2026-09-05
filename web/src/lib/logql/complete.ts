@@ -29,9 +29,19 @@ export interface Completion {
 export const STAGES: { name: string; detail: string; insert: string; caretShift: number }[] = [
 	{ name: '|= "…"', detail: 'line contains (case-sensitive)', insert: '|= ""', caretShift: -1 },
 	{ name: '!= "…"', detail: 'line does not contain', insert: '!= ""', caretShift: -1 },
-	{ name: '|~ "…"', detail: 'line matches RE2 (unanchored; (?i) for case-insensitive)', insert: '|~ ""', caretShift: -1 },
+	{
+		name: '|~ "…"',
+		detail: 'line matches RE2 (unanchored; (?i) for case-insensitive)',
+		insert: '|~ ""',
+		caretShift: -1
+	},
 	{ name: '!~ "…"', detail: 'line does not match RE2', insert: '!~ ""', caretShift: -1 },
-	{ name: '| json', detail: 'extract the line\'s JSON fields as labels', insert: '| json', caretShift: 0 }
+	{
+		name: '| json',
+		detail: "extract the line's JSON fields as labels",
+		insert: '| json',
+		caretShift: 0
+	}
 ];
 
 /** Range functions of the subset. */
@@ -53,7 +63,7 @@ export const KEYWORDS: { name: string; detail: string }[] = [
 	{ name: 'without', detail: 'without (labels)' },
 	{ name: 'and', detail: 'label filter conjunction' },
 	{ name: 'or', detail: 'label filter disjunction' },
-	{ name: 'vector', detail: 'vector(N) — scalar literal (Grafana\'s health check)' }
+	{ name: 'vector', detail: "vector(N) — scalar literal (Grafana's health check)" }
 ];
 
 /** Filter operators offered after a label name in a `| …` stage. */
@@ -273,7 +283,11 @@ export function suggest(ctx: Context, src: Sources): Completion[] {
 
 /** Applies a completion; returns the new text and caret. */
 export function apply(text: string, ctx: Context, c: Completion): { text: string; caret: number } {
-	const next = text.slice(0, ctx.start) + c.insert + text.slice(ctx.end);
+	// a value typed between `""` (or a range inside `[]`) must not double the closer
+	let end = ctx.end;
+	const last = c.insert[c.insert.length - 1];
+	if ((last === '"' || last === ']') && text[end] === last) end++;
+	const next = text.slice(0, ctx.start) + c.insert + text.slice(end);
 	const caret = ctx.start + c.insert.length + (c.caretShift ?? 0);
 	return { text: next, caret };
 }

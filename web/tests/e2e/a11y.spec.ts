@@ -49,7 +49,10 @@ for (const path of ROUTES) {
 						const r = e.getBoundingClientRect();
 						return r.width > 0 && r.height > 0 && r.height < 44;
 					})
-					.map((e) => `${e.tagName.toLowerCase()}.${e.className.split(' ')[0]} "${e.textContent?.trim().slice(0, 20)}" ${Math.round(e.getBoundingClientRect().height)}px`)
+					.map(
+						(e) =>
+							`${e.tagName.toLowerCase()}.${e.className.split(' ')[0]} "${e.textContent?.trim().slice(0, 20)}" ${Math.round(e.getBoundingClientRect().height)}px`
+					)
 			);
 		expect(small, 'controls shorter than 44px').toEqual([]);
 
@@ -61,7 +64,9 @@ for (const path of ROUTES) {
 			(v) => v.impact === 'serious' || v.impact === 'critical'
 		);
 		expect(
-			serious.map((v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
+			serious.map(
+				(v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`
+			),
 			'serious/critical axe violations'
 		).toEqual([]);
 	});

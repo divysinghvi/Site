@@ -140,8 +140,8 @@
 											<td
 												class:status-running={o.table.columns[j] === 'STATUS' && cell === 'Running'}
 												class:status-pending={o.table.columns[j] === 'STATUS' && cell === 'Pending'}
-												class:num={o.table.columns[j] === 'VALUE' || o.table.columns[j] === 'RESTARTS'}
-												>{cell}</td
+												class:num={o.table.columns[j] === 'VALUE' ||
+													o.table.columns[j] === 'RESTARTS'}>{cell}</td
 											>
 										{/each}
 									</tr>

@@ -21,7 +21,9 @@ test.describe('logs', () => {
 		const rows = page.locator('[data-log-row]');
 		await expect(rows.first()).toBeVisible({ timeout: 15_000 });
 		expect(await rows.count()).toBeGreaterThan(10);
-		await expect(page.getByRole('combobox', { name: 'LogQL query' })).toHaveValue('{service=~".+"}');
+		await expect(page.getByRole('combobox', { name: 'LogQL query' })).toHaveValue(
+			'{service=~".+"}'
+		);
 		// newest first: the first row's ns timestamp ≥ the last row's
 		const ts = await rows.evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.logRow!));
 		expect(BigInt(ts[0]!) >= BigInt(ts[ts.length - 1]!)).toBe(true);
@@ -47,8 +49,14 @@ test.describe('logs', () => {
 		expect(new Set(levels)).toEqual(new Set(['warn']));
 		await page.getByRole('button', { name: /^error/ }).click();
 		await expect(box).toHaveValue('{service=~".+", level=~"error|warn"}');
-		await expect(page.getByRole('button', { name: /^error/ })).toHaveAttribute('aria-pressed', 'true');
-		await expect(page.getByRole('button', { name: /^info/ })).toHaveAttribute('aria-pressed', 'false');
+		await expect(page.getByRole('button', { name: /^error/ })).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		await expect(page.getByRole('button', { name: /^info/ })).toHaveAttribute(
+			'aria-pressed',
+			'false'
+		);
 		await page.getByRole('button', { name: 'all' }).click();
 		await expect(box).toHaveValue('{service=~".+"}');
 		await expect(page).toHaveURL(/\/logs$/);
@@ -83,13 +91,19 @@ test.describe('logs', () => {
 		await expect(list).toBeVisible();
 		await expect(list.getByRole('option', { name: /label service/ })).toBeVisible();
 		await page.keyboard.press('Enter');
-		await expect(box).toHaveValue('{service=""}');
-		await expect(list.getByRole('option', { name: /value gradr/ })).toBeVisible({ timeout: 10_000 });
+		await expect(box).toHaveValue('{service=""');
+		await expect(list.getByRole('option', { name: /value gradr/ })).toBeVisible({
+			timeout: 10_000
+		});
+		await box.pressSequentially('gr');
+		await expect(list.getByRole('option', { name: /value gradr/ })).toBeVisible();
 		await page.keyboard.press('Enter');
-		await expect(box).toHaveValue('{service="gradr"}');
+		// the closing quote already there is reused, not doubled
+		await expect(box).toHaveValue('{service="gradr"');
 		await page.keyboard.press('End');
 		await box.pressSequentially('} ');
-		await expect(list.getByRole('option', { name: /\| json/ })).toBeVisible();
+		await expect(box).toHaveValue('{service="gradr"} ');
+		await expect(list.getByRole('option', { name: /^parser \| json/ })).toBeVisible();
 		await expect(list.getByRole('option', { name: /\|= "…"/ })).toBeVisible();
 	});
 
@@ -111,10 +125,9 @@ test.describe('logs', () => {
 		const bar = page.locator('.tail-bar');
 		await expect(bar).toBeVisible();
 		await expect(bar).toContainText('live tail');
-		// lines arrive one by one, characters in steps
+		// lines arrive one by one (a short first message may finish typing before we look)
 		await expect(page.locator('[data-log-row]')).toHaveCount(1, { timeout: 5_000 });
-		const typed = page.locator('[data-log-row]').first().locator('.msg');
-		await expect(typed).toHaveClass(/typing/);
+		expect(Number(await bar.getAttribute('data-tail-count'))).toBeLessThan(total);
 		await expect
 			.poll(async () => Number(await bar.getAttribute('data-tail-count')), { timeout: 10_000 })
 			.toBeGreaterThan(2);

@@ -3,8 +3,9 @@
 	let {
 		curl,
 		label = 'curl',
-		open = false
-	}: { curl: string; label?: string; open?: boolean } = $props();
+		open = $bindable(false),
+		id = 'curl'
+	}: { curl: string; label?: string; open?: boolean; id?: string } = $props();
 
 	let copied = $state(false);
 
@@ -20,15 +21,27 @@
 	}
 </script>
 
-<details class="curl panel" {open} data-curl>
-	<summary class="head">
-		<span class="mono dim">{label}</span>
-		<button type="button" class="btn small" onclick={(e) => (e.preventDefault(), void copy())}
-			>{copied ? 'Copied' : 'Copy'}</button
+<div class="curl panel" data-curl>
+	<div class="head">
+		<button
+			type="button"
+			class="toggle mono dim"
+			aria-expanded={open}
+			aria-controls="{id}-code"
+			onclick={() => (open = !open)}
 		>
-	</summary>
-	<pre class="code"><code>{curl}</code></pre>
-</details>
+			<span class="caret" aria-hidden="true">{open ? '▾' : '▸'}</span>
+			{label}
+		</button>
+		<button
+			type="button"
+			class="btn small"
+			onclick={() => void copy()}
+			aria-label="Copy the curl command">{copied ? 'Copied' : 'Copy'}</button
+		>
+	</div>
+	<pre class="code" id="{id}-code" hidden={!open}><code>{curl}</code></pre>
+</div>
 
 <style>
 	.curl {
@@ -39,23 +52,21 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem;
-		cursor: pointer;
-		list-style: none;
 	}
-	.head::-webkit-details-marker {
-		display: none;
-	}
-	.head::before {
-		content: '▸';
-		margin-right: 0.35rem;
-		color: var(--fg-dim);
-		font-size: 0.7rem;
-	}
-	.curl[open] .head::before {
-		content: '▾';
-	}
-	.head .mono {
+	.toggle {
 		flex: 1;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		min-height: 2rem;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		text-align: left;
+		cursor: pointer;
+	}
+	.caret {
+		font-size: 0.7rem;
 	}
 	.dim {
 		color: var(--fg-dim);

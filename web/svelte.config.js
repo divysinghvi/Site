@@ -42,7 +42,12 @@ const config = {
 				if (apiOwned.some((p) => path === p || path.startsWith(p))) return;
 				throw new Error(message);
 			},
-			handleMissingId: 'fail'
+			// `#panel=<id>` / `#layout=…` are dashboard state (read by the page, not
+			// element ids); every other missing fragment still fails the build.
+			handleMissingId: ({ id, message }) => {
+				if (/^[a-z]+=/.test(id)) return;
+				throw new Error(message);
+			}
 		}
 	}
 };

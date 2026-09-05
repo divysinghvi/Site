@@ -50,7 +50,8 @@
 		const hs = heads();
 		if (hs.length === 0) return false;
 		const i = hs.findIndex((h) => h === document.activeElement);
-		const next = i < 0 ? (delta > 0 ? 0 : hs.length - 1) : Math.min(hs.length - 1, Math.max(0, i + delta));
+		const next =
+			i < 0 ? (delta > 0 ? 0 : hs.length - 1) : Math.min(hs.length - 1, Math.max(0, i + delta));
 		const el = hs[next]!;
 		focusTs = el.dataset.ts ?? null;
 		el.focus();
@@ -172,7 +173,9 @@
 										{:else if k === 'postmortem' && v.startsWith('/postmortems/')}
 											<a href={v}>{v}</a>
 										{:else if k === 'ts' && row.tsTodo}
-											<span class="todo-val" title="content/logs.ndjson has no date for this line: it is ordered at the linked span's start"
+											<span
+												class="todo-val"
+												title="content/logs.ndjson has no date for this line: it is ordered at the linked span's start"
 												>{v}</span
 											>
 										{:else}
@@ -183,7 +186,10 @@
 							</dl>
 							<p class="when dim">
 								{#if row.tsTodo}
-									ts is TODO(divy): shown at the linked span's start ({formatPrecise(row.tsMs, 'day')})
+									ts is TODO(divy): shown at the linked span's start ({formatPrecise(
+										row.tsMs,
+										'day'
+									)})
 								{:else if row.precision !== 'day'}
 									precision {row.precision}: {formatPrecise(row.tsMs, row.precision)}
 								{:else}
@@ -201,7 +207,8 @@
 							<a class="btn small" href={spanHref(row.span)}>View span in trace ↗</a>
 						{/if}
 						{#if linkOf(row, 'postmortem', '/postmortems/')}
-							<a class="btn small" href={linkOf(row, 'postmortem', '/postmortems/')}>Postmortem ↗</a>
+							<a class="btn small" href={linkOf(row, 'postmortem', '/postmortems/')}>Postmortem ↗</a
+							>
 						{/if}
 						{#if linkOf(row, 'runbook', '/')}
 							<a class="btn small" href={linkOf(row, 'runbook', '/')}>Runbook ↗</a>
@@ -380,12 +387,27 @@
 		text-decoration: none;
 	}
 	@media (max-width: 639.98px) {
+		.line {
+			min-width: 0;
+		}
 		.head {
-			grid-template-columns: 4px auto auto 1fr;
+			grid-template-columns: 4px minmax(0, auto) minmax(0, auto) minmax(0, 1fr);
 			grid-template-areas:
 				'bar ts lvl labels'
 				'bar msg msg msg';
 			row-gap: 0.15rem;
+			overflow: hidden;
+		}
+		.labels {
+			flex-wrap: wrap;
+			justify-content: flex-end;
+			min-width: 0;
+			white-space: normal;
+		}
+		.chip {
+			max-width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 		.bar {
 			grid-area: bar;

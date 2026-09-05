@@ -19,7 +19,14 @@
 	}
 </script>
 
-<div class="toasts" role="status" aria-live="polite" aria-atomic="false" data-toasts>
+<div
+	class="toasts"
+	role="region"
+	aria-label="Notifications"
+	aria-live="polite"
+	aria-atomic="false"
+	data-toasts
+>
 	{#each toasts.items as t (t.id)}
 		<section class="toast slide-in tone-{t.tone}" data-toast={t.id} aria-label={t.title}>
 			<span class="badge mono" aria-hidden="true">{icon(t)}</span>

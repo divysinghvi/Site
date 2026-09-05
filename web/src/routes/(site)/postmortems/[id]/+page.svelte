@@ -30,6 +30,12 @@
 		const el = doc;
 		active = pm.toc[0]?.id ?? '';
 		if (!el) return;
+		// task-list checkboxes (goldmark `- [ ]`) carry no label: name them by their item text
+		for (const box of el.querySelectorAll<HTMLInputElement>('li > input[type="checkbox"]')) {
+			const text = box.parentElement?.textContent?.trim().replace(/\s+/g, ' ') ?? '';
+			if (text && !box.getAttribute('aria-label'))
+				box.setAttribute('aria-label', text.slice(0, 160));
+		}
 		const headings = Array.from(el.querySelectorAll<HTMLElement>('h2[id], h3[id]'));
 		if (headings.length === 0) return;
 		let raf = 0;

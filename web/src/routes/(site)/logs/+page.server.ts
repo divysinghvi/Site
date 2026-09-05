@@ -41,6 +41,15 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		labels,
 		services,
 		allFrom,
-		snapshot: { query, from: allFrom, to: now, limit: DEFAULT_LIMIT, streams, volume, bucket, entriesTotal }
+		snapshot: {
+			query,
+			from: allFrom,
+			to: now,
+			limit: DEFAULT_LIMIT,
+			streams,
+			volume,
+			bucket,
+			entriesTotal
+		}
 	};
 };

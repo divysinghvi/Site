@@ -34,7 +34,11 @@ export const KONAMI = [
  * Registers a key sequence typed outside editable elements (single keys, no
  * modifiers); `handler` runs when the last key lands. Returns the unbind function.
  */
-export function bindSequence(name: string, keys: readonly string[], handler: () => void): () => void {
+export function bindSequence(
+	name: string,
+	keys: readonly string[],
+	handler: () => void
+): () => void {
 	sequences.set(name, { keys, handler, at: 0 });
 	return () => {
 		sequences.delete(name);

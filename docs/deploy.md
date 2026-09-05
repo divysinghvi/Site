@@ -33,7 +33,7 @@ Three jobs on push to `main`, pull requests and manual dispatch: **go** (`make l
 |---|---|---|
 | `PORT` / `DIVY_ADDR` | `PORT` set by the platform | `:8080` |
 | `DIVY_DB_URL` / `TURSO_*` | Turso integration | `file:/data/divy.db` |
-| `SITE_ORIGIN` | `https://<project>.vercel.app` | `http://localhost:8080` |
+| `SITE_ORIGIN` | `https://websites-alpha-indol.vercel.app` | `http://localhost:8080` |
 | `DIVY_COLLECT_TOKEN`, `CRON_SECRET` | required for `/api/collect` | optional (scheduler runs in-process) |
 | `DIVY_GITHUB_TOKEN` | needed for `github_*` series | same |
 | `OTEL_*`, `RATE_LIMIT_*`, `RESPONSE_CACHE`, `CORS_ORIGINS`, `TRUSTED_PROXIES`, `TRUST_PROXY_HEADERS` | defaults | defaults |

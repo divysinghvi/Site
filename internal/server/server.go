@@ -273,6 +273,19 @@ func (s *Server) buildRouter() chi.Router {
 		r.Use(s.cfg.Trace.Middleware)
 	}
 	r.Use(s.cfg.Hooks.Outer...)
+	// gzip everything text-like except /metrics, which promhttp compresses itself.
+	// Prerendered HTML and the hashed assets are the bulk of a page load on Vercel.
+	compress := middleware.Compress(5)
+	r.Use(func(next http.Handler) http.Handler {
+		compressed := compress(next)
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/metrics" {
+				next.ServeHTTP(w, req)
+				return
+			}
+			compressed.ServeHTTP(w, req)
+		})
+	})
 	r.Use(securityHeaders)
 	r.Use(requestContext)
 	r.Use(s.metrics.Middleware)
