@@ -249,6 +249,16 @@ func cmdServe(args []string, stdout, stderr io.Writer) int {
 	reg := registerCollectors(cfg, cnt, st, log, tp)
 	runner := &collector.Runner{Store: st, Registry: reg, Logger: log}
 
+	// Without an in-process scheduler (Vercel), ordinary API traffic kicks
+	// due collection rounds in the background (DIVY_COLLECT_PIGGYBACK,
+	// default on when VERCEL is set). See collector.Piggyback.
+	var hooks server.Hooks
+	piggyback := !collect && envBool("DIVY_COLLECT_PIGGYBACK", strings.TrimSpace(config.Getenv("VERCEL")) != "")
+	if piggyback {
+		pb := &collector.Piggyback{Runner: runner, Budget: cfg.CollectBudget, Logger: log}
+		hooks.Inner = append(hooks.Inner, pb.Middleware)
+	}
+
 	cacheEntries := 0
 	if cfg.ResponseCache {
 		cacheEntries = server.DefaultCacheEntries
@@ -290,6 +300,7 @@ func cmdServe(args []string, stdout, stderr io.Writer) int {
 		TrustedProxies:    cfg.TrustedProxies,
 		TrustProxyHeaders: cfg.TrustProxyHeaders,
 		CacheEntries:      cacheEntries,
+		Hooks:             hooks,
 	})
 	if err != nil {
 		return fail(stderr, err)
@@ -304,7 +315,7 @@ func cmdServe(args []string, stdout, stderr io.Writer) int {
 	if err != nil {
 		return fail(stderr, err)
 	}
-	log.Info("divy serve", "addr", ln.Addr().String(), "db", st.Mode, "storage", storage, "collectors", strings.Join(reg.Names(), ","), "content", cfg.ContentDir, "spans", len(cnt.Nodes()), "logs", len(cnt.Logs), "todos", len(cnt.Todos), "collect", collect, "tracing", tp != nil, "ratelimit_rps", cfg.RateLimitRPS, "cache_entries", cacheEntries, "cors", len(cfg.CORSOrigins), "startup_ms", time.Since(start).Milliseconds(), "version", version.Version)
+	log.Info("divy serve", "addr", ln.Addr().String(), "db", st.Mode, "storage", storage, "collectors", strings.Join(reg.Names(), ","), "content", cfg.ContentDir, "spans", len(cnt.Nodes()), "logs", len(cnt.Logs), "todos", len(cnt.Todos), "collect", collect, "piggyback", piggyback, "tracing", tp != nil, "ratelimit_rps", cfg.RateLimitRPS, "cache_entries", cacheEntries, "cors", len(cfg.CORSOrigins), "startup_ms", time.Since(start).Milliseconds(), "version", version.Version)
 	errCh := make(chan error, 1)
 	go func() { errCh <- hs.Serve(ln) }()
 	select {
@@ -325,6 +336,18 @@ func cmdServe(args []string, stdout, stderr io.Writer) int {
 		log.Warn("shutdown", "err", err.Error())
 	}
 	return 0
+}
+
+// envBool parses a boolean env var (1/true/on/yes); empty = def.
+func envBool(name string, def bool) bool {
+	v := strings.ToLower(strings.TrimSpace(config.Getenv(name)))
+	switch v {
+	case "":
+		return def
+	case "1", "true", "on", "yes":
+		return true
+	}
+	return false
 }
 
 // storageKind classifies the store for /readyz: libsql (Turso), ephemeral
