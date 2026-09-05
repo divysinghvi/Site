@@ -46,6 +46,11 @@ type Config struct {
 	QueryMaxSamples     int           // QUERY_MAX_SAMPLES
 	QueryMaxConcurrency int           // QUERY_MAX_CONCURRENCY
 	OTelServiceName     string
+	OTelSampleRPS       float64 // OTEL_SAMPLE_RPS: root spans recorded per second
+	OTelSampleBurst     int     // OTEL_SAMPLE_BURST
+	RateLimitRPS        float64 // RATE_LIMIT_RPS: per-client token bucket refill
+	RateLimitBurst      int     // RATE_LIMIT_BURST
+	ResponseCache       bool    // RESPONSE_CACHE (default on; "off"/"0"/"false" disables the in-memory response cache)
 }
 
 // FromEnv builds the config from getenv (os.Getenv in production).
@@ -134,6 +139,49 @@ func FromEnv(getenv func(string) string) (Config, error) {
 			}
 			*d.dst = n
 		}
+	}
+	floats := []struct {
+		dst  *float64
+		key  string
+		def  float64
+		name string
+	}{
+		{&c.OTelSampleRPS, "OTEL_SAMPLE_RPS", 100, "otel sample rps"},
+		{&c.RateLimitRPS, "RATE_LIMIT_RPS", 20, "rate limit rps"},
+	}
+	for _, d := range floats {
+		*d.dst = d.def
+		if v := strings.TrimSpace(getenv(d.key)); v != "" {
+			f, err := strconv.ParseFloat(v, 64)
+			if err != nil || f <= 0 {
+				return c, fmt.Errorf("%s: %s must be a positive number", d.key, d.name)
+			}
+			*d.dst = f
+		}
+	}
+	bursts := []struct {
+		dst  *int
+		key  string
+		def  int
+		name string
+	}{
+		{&c.OTelSampleBurst, "OTEL_SAMPLE_BURST", 200, "otel sample burst"},
+		{&c.RateLimitBurst, "RATE_LIMIT_BURST", 100, "rate limit burst"},
+	}
+	for _, d := range bursts {
+		*d.dst = d.def
+		if v := strings.TrimSpace(getenv(d.key)); v != "" {
+			n, err := strconv.Atoi(v)
+			if err != nil || n < 1 {
+				return c, fmt.Errorf("%s: %s must be a positive integer", d.key, d.name)
+			}
+			*d.dst = n
+		}
+	}
+	c.ResponseCache = true
+	switch strings.ToLower(strings.TrimSpace(getenv("RESPONSE_CACHE"))) {
+	case "off", "0", "false", "no":
+		c.ResponseCache = false
 	}
 	if c.UptimeSelfURL == "" && c.SiteOrigin != "" {
 		c.UptimeSelfURL = strings.TrimRight(c.SiteOrigin, "/") + "/readyz"

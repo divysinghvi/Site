@@ -84,6 +84,24 @@
         },
         "PromExemplarsResult": {
           "$ref": "#/$defs/PromExemplarsResult"
+        },
+        "LokiQueryResult": {
+          "$ref": "#/$defs/LokiQueryResult"
+        },
+        "LokiLabelsResult": {
+          "$ref": "#/$defs/LokiLabelsResult"
+        },
+        "LokiSeriesResult": {
+          "$ref": "#/$defs/LokiSeriesResult"
+        },
+        "LokiIndexStats": {
+          "$ref": "#/$defs/LokiIndexStats"
+        },
+        "LokiVolumeResult": {
+          "$ref": "#/$defs/LokiVolumeResult"
+        },
+        "LokiBuildInfo": {
+          "$ref": "#/$defs/LokiBuildInfo"
         }
       },
       "additionalProperties": false,
@@ -115,7 +133,13 @@
         "PromBuildInfoResult",
         "PromRulesResult",
         "PromAlertsResult",
-        "PromExemplarsResult"
+        "PromExemplarsResult",
+        "LokiQueryResult",
+        "LokiLabelsResult",
+        "LokiSeriesResult",
+        "LokiIndexStats",
+        "LokiVolumeResult",
+        "LokiBuildInfo"
       ]
     },
     "AlertGroup": {
@@ -678,6 +702,16 @@
             }
           ]
         },
+        "note": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "status": {
           "$ref": "#/$defs/UptimeStatus"
         },
@@ -714,6 +748,7 @@
         "name",
         "url",
         "span",
+        "note",
         "status",
         "last",
         "uptime",
@@ -1187,6 +1222,413 @@
         "day",
         "month",
         "year"
+      ]
+    },
+    "LokiBuildInfo": {
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "buildUser": {
+          "type": "string"
+        },
+        "buildDate": {
+          "type": "string"
+        },
+        "goVersion": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "version",
+        "revision",
+        "branch",
+        "buildUser",
+        "buildDate",
+        "goVersion"
+      ]
+    },
+    "LokiIndexStats": {
+      "properties": {
+        "streams": {
+          "type": "integer"
+        },
+        "chunks": {
+          "type": "integer"
+        },
+        "entries": {
+          "type": "integer"
+        },
+        "bytes": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "streams",
+        "chunks",
+        "entries",
+        "bytes"
+      ]
+    },
+    "LokiIngesterStats": {
+      "properties": {
+        "compressedBytes": {
+          "type": "integer"
+        },
+        "decompressedBytes": {
+          "type": "integer"
+        },
+        "decompressedLines": {
+          "type": "integer"
+        },
+        "headChunkBytes": {
+          "type": "integer"
+        },
+        "headChunkLines": {
+          "type": "integer"
+        },
+        "totalBatches": {
+          "type": "integer"
+        },
+        "totalChunksMatched": {
+          "type": "integer"
+        },
+        "totalDuplicates": {
+          "type": "integer"
+        },
+        "totalLinesSent": {
+          "type": "integer"
+        },
+        "totalReached": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "compressedBytes",
+        "decompressedBytes",
+        "decompressedLines",
+        "headChunkBytes",
+        "headChunkLines",
+        "totalBatches",
+        "totalChunksMatched",
+        "totalDuplicates",
+        "totalLinesSent",
+        "totalReached"
+      ]
+    },
+    "LokiLabelsResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "LokiQueryData": {
+      "properties": {
+        "resultType": {
+          "$ref": "#/$defs/LokiResultType"
+        },
+        "result": {
+          "$ref": "#/$defs/LokiResult"
+        },
+        "stats": {
+          "$ref": "#/$defs/LokiStats"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "resultType",
+        "result",
+        "stats"
+      ]
+    },
+    "LokiQueryResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/LokiQueryData"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "LokiResult": {
+      "oneOf": [
+        {
+          "items": {
+            "properties": {
+              "stream": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "values": {
+                "items": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2
+                },
+                "type": "array"
+              }
+            },
+            "type": "object",
+            "required": [
+              "stream",
+              "values"
+            ]
+          },
+          "type": "array"
+        },
+        {
+          "items": {
+            "properties": {
+              "metric": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "values": {
+                "items": {
+                  "items": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2
+                },
+                "type": "array"
+              }
+            },
+            "type": "object",
+            "required": [
+              "metric",
+              "values"
+            ]
+          },
+          "type": "array"
+        },
+        {
+          "items": {
+            "properties": {
+              "metric": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "value": {
+                "items": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              }
+            },
+            "type": "object",
+            "required": [
+              "metric",
+              "value"
+            ]
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "LokiResultType": {
+      "type": "string",
+      "enum": [
+        "streams",
+        "matrix",
+        "vector"
+      ]
+    },
+    "LokiSeriesResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "LokiStats": {
+      "properties": {
+        "ingester": {
+          "$ref": "#/$defs/LokiIngesterStats"
+        },
+        "store": {
+          "$ref": "#/$defs/LokiStoreStats"
+        },
+        "summary": {
+          "$ref": "#/$defs/LokiSummaryStats"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ingester",
+        "store",
+        "summary"
+      ]
+    },
+    "LokiStoreStats": {
+      "properties": {
+        "compressedBytes": {
+          "type": "integer"
+        },
+        "decompressedBytes": {
+          "type": "integer"
+        },
+        "decompressedLines": {
+          "type": "integer"
+        },
+        "chunksDownloadTime": {
+          "type": "number"
+        },
+        "totalChunksRef": {
+          "type": "integer"
+        },
+        "totalChunksDownloaded": {
+          "type": "integer"
+        },
+        "totalDuplicates": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "compressedBytes",
+        "decompressedBytes",
+        "decompressedLines",
+        "chunksDownloadTime",
+        "totalChunksRef",
+        "totalChunksDownloaded",
+        "totalDuplicates"
+      ]
+    },
+    "LokiSummaryStats": {
+      "properties": {
+        "bytesProcessedPerSecond": {
+          "type": "integer"
+        },
+        "execTime": {
+          "type": "number"
+        },
+        "linesProcessedPerSecond": {
+          "type": "integer"
+        },
+        "queueTime": {
+          "type": "number"
+        },
+        "totalBytesProcessed": {
+          "type": "integer"
+        },
+        "totalLinesProcessed": {
+          "type": "integer"
+        },
+        "totalEntriesReturned": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "bytesProcessedPerSecond",
+        "execTime",
+        "linesProcessedPerSecond",
+        "queueTime",
+        "totalBytesProcessed",
+        "totalLinesProcessed",
+        "totalEntriesReturned"
+      ]
+    },
+    "LokiVolumeData": {
+      "properties": {
+        "resultType": {
+          "$ref": "#/$defs/LokiResultType"
+        },
+        "result": {
+          "$ref": "#/$defs/LokiResult"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "resultType",
+        "result"
+      ]
+    },
+    "LokiVolumeResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/LokiVolumeData"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
       ]
     },
     "ManualMetric": {
@@ -2399,6 +2841,9 @@
         },
         "error": {
           "type": "string"
+        },
+        "storage": {
+          "$ref": "#/$defs/StorageKind"
         }
       },
       "additionalProperties": false,
@@ -2581,6 +3026,14 @@
         "version",
         "services",
         "trace"
+      ]
+    },
+    "StorageKind": {
+      "type": "string",
+      "enum": [
+        "file",
+        "libsql",
+        "ephemeral"
       ]
     },
     "TOCEntry": {

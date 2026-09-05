@@ -1,8 +1,8 @@
 // Package server is the chi router of the divy binary: health, robots, the
 // ASCII negotiation on `/`, the content endpoints, the Jaeger trace endpoints,
-// the collect endpoint, the Prometheus HTTP API (promapi.go), /metrics and
-// the embedded static site. Loki and the OTel/CORS/cache middlewares are
-// mounted by their own packages through the hooks.
+// the collect endpoint, the Prometheus HTTP API (promapi.go), the Loki HTTP
+// API (handlers_loki.go), /metrics and the embedded static site. The
+// OTel/CORS/cache middlewares are mounted by their own packages through the hooks.
 package server
 
 import (
@@ -25,6 +25,7 @@ import (
 	"divy.dev/internal/model"
 	"divy.dev/internal/promql"
 	"divy.dev/internal/store"
+	"divy.dev/internal/trace"
 	"divy.dev/internal/version"
 )
 
@@ -69,6 +70,25 @@ type Config struct {
 	CollectorIntervals map[string]time.Duration
 	// Metrics is the client_golang registry; nil = a new one built here.
 	Metrics *metrics.Registry
+	// Storage is the time-series backend reported by /readyz: file, libsql
+	// or ephemeral (a file database under /tmp on Vercel).
+	Storage model.StorageKind
+
+	// Trace installs the OTel request middleware (X-Divy-Trace-Id on every
+	// response) and the store spans; nil = no self-tracing, no header.
+	Trace *trace.Provider
+	// RateLimit configures the per-client and global token buckets; RPS <= 0 disables them.
+	RateLimit RateLimitConfig
+	// CORSOrigins is the exact-match allow-list (CORS_ORIGINS); empty = no CORS headers.
+	CORSOrigins []string
+	// TrustedProxies are the CIDRs whose X-Forwarded-For / X-Real-IP are believed (TRUSTED_PROXIES).
+	TrustedProxies []string
+	// TrustProxyHeaders believes the forwarding headers from any peer (Vercel: the platform sets them).
+	TrustProxyHeaders bool
+	// CacheEntries enables the in-memory response cache with that many
+	// entries (0 = disabled); CacheBytes bounds its total body size (0 = 32 MiB).
+	CacheEntries int
+	CacheBytes   int64
 
 	// Hooks are the slots later packages fill; see Hooks.
 	Hooks Hooks
@@ -101,6 +121,10 @@ type Server struct {
 	metrics *metrics.Registry
 	live    *metrics.Live
 	prom    *promAPI
+	proxies *proxyTrust
+	limiter *rateLimiter
+	cache   *responseCache
+	og      *ogCache
 }
 
 // Cache-Control classes (contract §K.3.2, Vercel adaptation: explicit s-maxage).
@@ -177,16 +201,50 @@ func New(cfg Config) (*Server, error) {
 	if s.metrics == nil {
 		s.metrics = metrics.New(metrics.Options{Store: cfg.Store, Live: s.live, Intervals: intervals, Now: cfg.Now, Logger: cfg.Logger})
 	}
+	proxies, err := newProxyTrust(cfg.TrustedProxies, cfg.TrustProxyHeaders)
+	if err != nil {
+		return nil, err
+	}
+	s.proxies = proxies
+	if cfg.RateLimit.RPS > 0 {
+		s.limiter = newRateLimiter(cfg.RateLimit)
+	}
+	if cfg.CacheEntries > 0 {
+		s.cache = newResponseCache(s, cfg.CacheEntries, cfg.CacheBytes)
+	}
+	s.og = newOGCache(s)
 	if cfg.Runner != nil && cfg.Runner.OnResult == nil {
-		cfg.Runner.OnResult = s.metrics.OnResult
+		// Collector results feed the run metrics and, after a successful
+		// run, drop every cached response (collector.Batch writes do not
+		// bump store.Generation()).
+		onResult := s.metrics.OnResult
+		cache := s.cache
+		cfg.Runner.OnResult = func(name, outcome string, d time.Duration) {
+			onResult(name, outcome, d)
+			if outcome == collector.OutcomeOK && cache != nil {
+				cache.Invalidate()
+			}
+		}
 	}
 	engine := &promql.Engine{Live: s.live, Lookback: cfg.QueryLookback, Timeout: cfg.QueryTimeout, MaxSamples: cfg.QueryMaxSamples, MaxConcurrency: cfg.QueryMaxConcurrency}
 	if cfg.Store != nil {
 		engine.Storage = storeQuerier{st: cfg.Store}
+		if cfg.Trace != nil {
+			engine.Storage = tracedQuerier{inner: engine.Storage, tp: cfg.Trace}
+		}
 	}
 	s.prom = &promAPI{s: s, engine: engine, live: s.live}
 	s.router = s.buildRouter()
 	return s, nil
+}
+
+// Cache returns the response cache (nil when disabled); collectors run
+// outside the Runner hook call Invalidate after writing.
+func (s *Server) Cache() interface{ Invalidate() } {
+	if s.cache == nil {
+		return nil
+	}
+	return s.cache
 }
 
 // Metrics returns the registry behind /metrics (the collector runner's OnResult hook).
@@ -203,12 +261,26 @@ func (s *Server) now() time.Time { return s.cfg.Now().UTC() }
 func (s *Server) buildRouter() chi.Router {
 	r := chi.NewRouter()
 	r.Use(s.recoverer)
+	if s.cfg.Trace != nil {
+		r.Use(s.cfg.Trace.Middleware)
+	}
 	r.Use(s.cfg.Hooks.Outer...)
 	r.Use(securityHeaders)
 	r.Use(requestContext)
 	r.Use(s.metrics.Middleware)
 	r.Use(s.requestLog)
 	r.Use(middleware.GetHead)
+	// contract K-X1 order: clientIP → rateLimit → cors → cache
+	r.Use(s.clientIPMiddleware)
+	if s.limiter != nil {
+		r.Use(s.limiter.middleware)
+	}
+	if len(s.cfg.CORSOrigins) > 0 {
+		r.Use(s.cors)
+	}
+	if s.cache != nil {
+		r.Use(s.cache.middleware)
+	}
 	r.Use(s.cfg.Hooks.Inner...)
 
 	r.NotFound(s.static.ServeHTTP)
@@ -237,6 +309,13 @@ func (s *Server) buildRouter() chi.Router {
 			r.Get("/profile", s.handleContentProfile)
 			r.Get("/todos", s.handleContentTodos)
 		})
+		r.Get("/api/uptime", s.handleUptime)
+		r.Get("/api/uptime/heartbeats", s.handleUptimeHeartbeats)
+		r.Get("/favicon.svg", s.handleFavicon)
+		r.Get("/favicon.ico", s.handleFaviconICO)
+		r.Get("/og/default.png", s.handleOGDefault)
+		r.Get("/og/postmortems/{id}.png", s.handleOGPostmortem)
+		r.Get("/og/{id}.png", s.handleOGPostmortem)
 		r.Get("/api/traces", s.handleTraceSearch)
 		r.Get("/api/traces/{id}", s.handleTrace)
 		r.Get("/api/services", s.handleServices)
@@ -253,6 +332,8 @@ func (s *Server) buildRouter() chi.Router {
 		r.MethodNotAllowed(s.methodNotAllowed)
 		s.prom.mount(r)
 	})
+	// The Loki family (handlers_loki.go) is a sub-router for the same reason.
+	s.mountLoki(r, timeout)
 
 	for _, m := range s.cfg.Hooks.Mount {
 		m(r)
@@ -321,7 +402,7 @@ func (s *Server) promNotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) lokiNotFound(w http.ResponseWriter, r *http.Request) {
-	writeText(w, http.StatusNotFound, CacheNS, "not supported by divy.dev; see /loki/api/v1/status/buildinfo")
+	writeText(w, http.StatusNotFound, CacheNS, lokiNotSupported)
 }
 
 var allowProbe = []string{http.MethodGet, http.MethodHead, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions}
@@ -362,7 +443,12 @@ func RequestID(ctx context.Context) string {
 
 func requestContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id := middleware.GetReqID(r.Context())
+		// The request id is the request's own trace id when tracing is on
+		// (the log line, the 500 body and X-Divy-Trace-Id then agree).
+		id := trace.TraceIDFromContext(r.Context())
+		if id == "" {
+			id = middleware.GetReqID(r.Context())
+		}
 		if id == "" {
 			id = fmt.Sprintf("%d", time.Now().UnixNano())
 		}
@@ -409,8 +495,12 @@ func (s *Server) recoverer(next http.Handler) http.Handler {
 				if rec == http.ErrAbortHandler {
 					panic(rec)
 				}
-				s.log.Error("panic", "err", fmt.Sprint(rec), "path", r.URL.Path, "req", RequestID(r.Context()))
-				writeError(w, http.StatusInternalServerError, "internal error: "+RequestID(r.Context()))
+				id := RequestID(r.Context())
+				if id == "" {
+					id = w.Header().Get(trace.HeaderTraceID)
+				}
+				s.log.Error("panic", "err", fmt.Sprint(rec), "path", r.URL.Path, "req", id)
+				writeError(w, http.StatusInternalServerError, "internal error: "+id)
 			}
 		}()
 		next.ServeHTTP(w, r)

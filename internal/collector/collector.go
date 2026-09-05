@@ -233,25 +233,80 @@ func (r *Runner) report(name, outcome string, d time.Duration) {
 	}
 }
 
+// RoundOptions tune one collection round.
+type RoundOptions struct {
+	// Budget bounds the whole round (default 8s).
+	Budget time.Duration
+	// Names selects collectors (empty = all registered).
+	Names []string
+	// OnlyDue skips a collector whose last successful run is younger than its
+	// interval (minus a small slack): the collect endpoint is called every five
+	// minutes but GitHub, PyPI, manual and retention keep their own cadences.
+	OnlyDue bool
+	// Now overrides the clock (tests).
+	Now func() time.Time
+}
+
 // RunRound runs the named collectors (all when names is empty) concurrently
 // within budget and returns the /api/collect summary. Each collector gets
 // min(RunTimeout(interval), budget); Truncated is true when the budget
 // expired before every collector finished.
 func (r *Runner) RunRound(ctx context.Context, budget time.Duration, names ...string) model.CollectSummary {
+	return r.RunRoundOpts(ctx, RoundOptions{Budget: budget, Names: names})
+}
+
+// DueSlack is how early a collector may run before its interval has fully
+// elapsed: min(interval/10, 1m) — a cron that fires a little late must not
+// push every run to the next tick.
+func DueSlack(interval time.Duration) time.Duration {
+	if d := interval / 10; d < time.Minute {
+		return d
+	}
+	return time.Minute
+}
+
+// RunRoundOpts is RunRound with options.
+func (r *Runner) RunRoundOpts(ctx context.Context, o RoundOptions) model.CollectSummary {
+	budget := o.Budget
 	if budget <= 0 {
 		budget = 8 * time.Second
+	}
+	now := time.Now
+	if o.Now != nil {
+		now = o.Now
 	}
 	rctx, cancel := context.WithTimeout(ctx, budget)
 	defer cancel()
 	var selected []Collector
 	for _, c := range r.Registry.Collectors() {
-		if len(names) == 0 || containsStr(names, c.Name()) {
+		if len(o.Names) == 0 || containsStr(o.Names, c.Name()) {
 			selected = append(selected, c)
+		}
+	}
+	var last map[string]int64
+	if o.OnlyDue && r.Store != nil {
+		var err error
+		if last, err = r.Store.LastSuccess(rctx); err != nil {
+			r.logger().Warn("collector: last success", "err", err.Error())
+			last = nil
 		}
 	}
 	results := make([]model.CollectorResult, len(selected))
 	var wg sync.WaitGroup
 	for i, c := range selected {
+		if o.OnlyDue {
+			if ms, ok := last[c.Name()]; ok {
+				age := now().Sub(time.UnixMilli(ms))
+				if age < 0 {
+					age = 0 // another instance's clock is ahead of ours
+				}
+				if wait := c.Interval() - DueSlack(c.Interval()) - age; wait > 0 {
+					results[i] = model.CollectorResult{Name: c.Name(), Error: fmt.Sprintf("skipped: not due (last success %s ago, interval %s)", age.Truncate(time.Second), c.Interval())}
+					r.report(c.Name(), OutcomeSkipped, 0)
+					continue
+				}
+			}
+		}
 		wg.Add(1)
 		go func(i int, c Collector) {
 			defer wg.Done()
@@ -393,3 +448,26 @@ func SortedNames(m map[string]model.ReadyzCollector) []string {
 	sort.Strings(out)
 	return out
 }
+
+// disabled wraps a collector that is switched off by configuration
+// (COLLECT_DISABLED): every run is reported as skipped with the reason.
+type disabled struct {
+	Collector
+	reason string
+}
+
+// WrapDisabled returns a collector that never runs and reports reason.
+func WrapDisabled(c Collector, reason string) Collector {
+	return disabled{Collector: c, reason: reason}
+}
+
+// Disabled is true.
+func (disabled) Disabled() bool { return true }
+
+// Run returns ErrDisabled with the reason.
+func (d disabled) Run(context.Context) (Result, error) {
+	return Result{}, fmt.Errorf("%w: %s", ErrDisabled, d.reason)
+}
+
+// Unwrap exposes the wrapped collector (tests).
+func (d disabled) Unwrap() Collector { return d.Collector }

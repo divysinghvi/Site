@@ -36,6 +36,12 @@ type APIRoots struct {
 	PromRulesResult          PromRulesResult          `json:"PromRulesResult"`
 	PromAlertsResult         PromAlertsResult         `json:"PromAlertsResult"`
 	PromExemplarsResult      PromExemplarsResult      `json:"PromExemplarsResult"`
+	LokiQueryResult          LokiQueryResult          `json:"LokiQueryResult"`
+	LokiLabelsResult         LokiLabelsResult         `json:"LokiLabelsResult"`
+	LokiSeriesResult         LokiSeriesResult         `json:"LokiSeriesResult"`
+	LokiIndexStats           LokiIndexStats           `json:"LokiIndexStats"`
+	LokiVolumeResult         LokiVolumeResult         `json:"LokiVolumeResult"`
+	LokiBuildInfo            LokiBuildInfo            `json:"LokiBuildInfo"`
 }
 
 // SchemaRoots lists every schema file divy schemagen writes, in output order.

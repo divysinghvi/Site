@@ -39,6 +39,9 @@ type Registry struct {
 	httpDuration *prometheus.HistogramVec
 	collRuns     *prometheus.CounterVec
 	collDuration *prometheus.HistogramVec
+	otelSpans    *prometheus.CounterVec
+	otelExported prometheus.Counter
+	otelErrors   prometheus.Counter
 	opts         Options
 }
 
@@ -59,10 +62,25 @@ func New(o Options) *Registry {
 	r.httpDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{Name: "divy_http_request_duration_seconds", Help: help("divy_http_request_duration_seconds"), Buckets: []float64{0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10}}, []string{"route", "method"})
 	r.collRuns = prometheus.NewCounterVec(prometheus.CounterOpts{Name: "divy_collector_runs_total", Help: help("divy_collector_runs_total")}, []string{"collector", "result"})
 	r.collDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{Name: "divy_collector_run_duration_seconds", Help: help("divy_collector_run_duration_seconds"), Buckets: []float64{0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30, 60, 120}}, []string{"collector"})
-	r.reg.MustRegister(r.httpRequests, r.httpDuration, r.collRuns, r.collDuration)
+	r.otelSpans = prometheus.NewCounterVec(prometheus.CounterOpts{Name: "divy_otel_spans_total", Help: help("divy_otel_spans_total")}, []string{"decision"})
+	r.otelExported = prometheus.NewCounter(prometheus.CounterOpts{Name: "divy_otel_exported_spans_total", Help: help("divy_otel_exported_spans_total")})
+	r.otelErrors = prometheus.NewCounter(prometheus.CounterOpts{Name: "divy_otel_export_errors_total", Help: help("divy_otel_export_errors_total")})
+	for _, d := range []string{"sampled", "dropped", "scrape"} {
+		r.otelSpans.WithLabelValues(d) // known decisions start at 0
+	}
+	r.reg.MustRegister(r.httpRequests, r.httpDuration, r.collRuns, r.collDuration, r.otelSpans, r.otelExported, r.otelErrors)
 	r.reg.MustRegister(&catalogueCollector{r: r})
 	return r
 }
+
+// SpanDecision counts a root-span sampling decision (sampled | dropped | scrape); trace.Metrics.
+func (r *Registry) SpanDecision(decision string) { r.otelSpans.WithLabelValues(decision).Inc() }
+
+// SpansExported counts spans written to otel_spans; trace.Metrics.
+func (r *Registry) SpansExported(n int) { r.otelExported.Add(float64(n)) }
+
+// ExportError counts a failed span export batch; trace.Metrics.
+func (r *Registry) ExportError() { r.otelErrors.Inc() }
 
 func help(name string) string {
 	f, _ := Lookup(name)

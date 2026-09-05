@@ -79,7 +79,7 @@ var Catalogue = []Family{
 	{Name: "divy_collector_run_duration_seconds", Type: Histogram, Help: "Duration of collector runs in seconds, by collector.", Labels: []string{"collector"}, Source: SourceProcess},
 	{Name: "divy_http_requests_total", Type: Counter, Help: "HTTP requests served by the API, by route, method and status code.", Labels: []string{"route", "method", "code"}, Source: SourceProcess},
 	{Name: "divy_http_request_duration_seconds", Type: Histogram, Help: "HTTP request duration in seconds, by route and method.", Labels: []string{"route", "method"}, Source: SourceProcess},
-	{Name: "divy_otel_spans_total", Type: Counter, Help: "Request spans started by the OpenTelemetry sampler, by decision.", Labels: []string{"decision"}, Source: SourceProcess},
+	{Name: "divy_otel_spans_total", Type: Counter, Help: "Root spans decided by the OpenTelemetry sampler, by decision (sampled, dropped by the rate cap, scrape = Prometheus scrapes of /metrics, never recorded).", Labels: []string{"decision"}, Source: SourceProcess},
 	{Name: "divy_otel_exported_spans_total", Type: Counter, Help: "Spans written to the otel_spans table.", Source: SourceProcess},
 	{Name: "divy_otel_export_errors_total", Type: Counter, Help: "Failed span export batches.", Source: SourceProcess},
 }

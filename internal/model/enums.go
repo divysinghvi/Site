@@ -120,6 +120,14 @@ func (ReadyStatus) JSONSchema() *jsonschema.Schema {
 	return stringEnum("ok", "unavailable", "shutting_down")
 }
 
+// StorageKind is the time-series backend reported by /readyz.
+type StorageKind string
+
+// JSONSchema lists the storage kinds.
+func (StorageKind) JSONSchema() *jsonschema.Schema {
+	return stringEnum("file", "libsql", "ephemeral")
+}
+
 // UptimeStatus is the current state of an uptime target.
 type UptimeStatus string
 

@@ -44,6 +44,18 @@ func (s *Server) handleTrace(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "internal error: "+RequestID(r.Context()))
 		return
 	}
+	if len(rows) == 0 && s.cfg.Trace != nil {
+		// The request that produced the header ended milliseconds ago; its
+		// children may still be buffered behind a root that has not ended.
+		fctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		_ = s.cfg.Trace.ForceFlush(fctx)
+		cancel()
+		if rows, err = s.cfg.Store.ReadTrace(r.Context(), id); err != nil {
+			s.log.Error("read trace", "err", err.Error())
+			writeError(w, http.StatusInternalServerError, "internal error: "+RequestID(r.Context()))
+			return
+		}
+	}
 	if len(rows) == 0 {
 		writeError(w, http.StatusNotFound, traceNotFound)
 		return
@@ -377,6 +389,3 @@ func attrKV(key string, v any) model.JaegerKeyValue {
 		return model.JaegerKeyValue{Key: key, Type: "string", Value: string(b)}
 	}
 }
-
-// unusedCtx keeps context imported for future flush-and-retry (OTel agent).
-var _ = context.Background

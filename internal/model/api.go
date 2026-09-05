@@ -114,6 +114,9 @@ type ReadyzDB struct {
 	OK        bool    `json:"ok"`
 	LatencyMs float64 `json:"latency_ms"`
 	Error     string  `json:"error,omitempty"`
+	// Storage is file (SQLite on disk), libsql (Turso) or ephemeral (a file
+	// database under /tmp on Vercel: samples vanish with the instance).
+	Storage StorageKind `json:"storage,omitempty"`
 }
 
 // ReadyzContent describes the loaded content.
@@ -275,10 +278,12 @@ type UptimeIncident struct {
 
 // HeartbeatTarget is one target of /api/uptime/heartbeats.
 type HeartbeatTarget struct {
-	Target    string            `json:"target"`
-	Name      string            `json:"name"`
-	URL       string            `json:"url"`
-	Span      *string           `json:"span" jsonschema:"nullable"`
+	Target string  `json:"target"`
+	Name   string  `json:"name"`
+	URL    string  `json:"url"`
+	Span   *string `json:"span" jsonschema:"nullable"`
+	// Note is the target's caveat from uptime.yaml (e.g. the self-probe note).
+	Note      *string           `json:"note" jsonschema:"nullable"`
 	Status    UptimeStatus      `json:"status"`
 	Last      *ProbeLast        `json:"last" jsonschema:"nullable"`
 	Uptime    UptimeWindows     `json:"uptime"`

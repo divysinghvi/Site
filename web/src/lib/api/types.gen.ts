@@ -9,6 +9,11 @@
 export type ReadyStatus = 'ok' | 'unavailable' | 'shutting_down';
 /**
  * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "StorageKind".
+ */
+export type StorageKind = 'file' | 'libsql' | 'ephemeral';
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
  * via the `definition` "DateOrTodo".
  */
 export type DateOrTodo = string;
@@ -107,6 +112,65 @@ export type PromErrorType =
 	'bad_data' | 'execution' | 'timeout' | 'internal' | 'unavailable' | 'not_found';
 /**
  * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromResultType".
+ */
+export type PromResultType = 'vector' | 'matrix' | 'scalar' | 'string';
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromResult".
+ */
+export type PromResult =
+	| {
+			metric: {
+				[k: string]: string | undefined;
+			};
+			/**
+			 * @minItems 2
+			 * @maxItems 2
+			 */
+			value: [number | string, number | string];
+	  }[]
+	| {
+			metric: {
+				[k: string]: string | undefined;
+			};
+			values: [number | string, number | string][];
+	  }[]
+	| [number | string, number | string];
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiResultType".
+ */
+export type LokiResultType = 'streams' | 'matrix' | 'vector';
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiResult".
+ */
+export type LokiResult =
+	| {
+			stream: {
+				[k: string]: string | undefined;
+			};
+			values: [string, string][];
+	  }[]
+	| {
+			metric: {
+				[k: string]: string | undefined;
+			};
+			values: [number | string, number | string][];
+	  }[]
+	| {
+			metric: {
+				[k: string]: string | undefined;
+			};
+			/**
+			 * @minItems 2
+			 * @maxItems 2
+			 */
+			value: [number | string, number | string];
+	  }[];
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
  * via the `definition` "IntOrList".
  */
 export type IntOrList = number | [number, ...number[]];
@@ -148,6 +212,20 @@ export interface APIRoots {
 	CollectSummary: CollectSummary;
 	PlainError: PlainError;
 	PromError: PromError;
+	PromQueryResult: PromQueryResult;
+	PromSeriesResult: PromSeriesResult;
+	PromLabelsResult: PromLabelsResult;
+	PromMetadataResult: PromMetadataResult;
+	PromBuildInfoResult: PromBuildInfoResult;
+	PromRulesResult: PromRulesResult;
+	PromAlertsResult: PromAlertsResult;
+	PromExemplarsResult: PromExemplarsResult;
+	LokiQueryResult: LokiQueryResult;
+	LokiLabelsResult: LokiLabelsResult;
+	LokiSeriesResult: LokiSeriesResult;
+	LokiIndexStats: LokiIndexStats;
+	LokiVolumeResult: LokiVolumeResult;
+	LokiBuildInfo: LokiBuildInfo;
 }
 /**
  * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
@@ -291,6 +369,7 @@ export interface ReadyzDB {
 	ok: boolean;
 	latency_ms: number;
 	error?: string;
+	storage?: StorageKind;
 }
 /**
  * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
@@ -719,6 +798,7 @@ export interface HeartbeatTarget {
 	name: string;
 	url: string;
 	span: string | null;
+	note: string | null;
 	status: UptimeStatus;
 	last: ProbeLast | null;
 	uptime: UptimeWindows;
@@ -803,6 +883,294 @@ export interface PromError {
 	status: string;
 	errorType: PromErrorType;
 	error: string;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromQueryResult".
+ */
+export interface PromQueryResult {
+	status: string;
+	data: PromQueryData;
+	warnings?: string[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromQueryData".
+ */
+export interface PromQueryData {
+	resultType: PromResultType;
+	result: PromResult;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromSeriesResult".
+ */
+export interface PromSeriesResult {
+	status: string;
+	data: {
+		[k: string]: string | undefined;
+	}[];
+	warnings?: string[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromLabelsResult".
+ */
+export interface PromLabelsResult {
+	status: string;
+	data: string[];
+	warnings?: string[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromMetadataResult".
+ */
+export interface PromMetadataResult {
+	status: string;
+	data: {
+		[k: string]: PromMetadata[] | undefined;
+	};
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromMetadata".
+ */
+export interface PromMetadata {
+	type: string;
+	help: string;
+	unit: string;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromBuildInfoResult".
+ */
+export interface PromBuildInfoResult {
+	status: string;
+	data: PromBuildInfo;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromBuildInfo".
+ */
+export interface PromBuildInfo {
+	version: string;
+	revision: string;
+	branch: string;
+	buildUser: string;
+	buildDate: string;
+	goVersion: string;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromRulesResult".
+ */
+export interface PromRulesResult {
+	status: string;
+	data: PromRuleGroups;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromRuleGroups".
+ */
+export interface PromRuleGroups {
+	groups: PromRuleGroup[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromRuleGroup".
+ */
+export interface PromRuleGroup {
+	name: string;
+	file: string;
+	rules: PromAlertingRule[];
+	interval: number;
+	limit: number;
+	evaluationTime: number;
+	lastEvaluation: string;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromAlertingRule".
+ */
+export interface PromAlertingRule {
+	state: string;
+	name: string;
+	query: string;
+	duration: number;
+	keepFiringFor: number;
+	labels: {
+		[k: string]: string | undefined;
+	};
+	annotations: {
+		[k: string]: string | undefined;
+	};
+	alerts: PromAlert[];
+	health: string;
+	evaluationTime: number;
+	lastEvaluation: string;
+	type: string;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromAlert".
+ */
+export interface PromAlert {
+	labels: {
+		[k: string]: string | undefined;
+	};
+	annotations: {
+		[k: string]: string | undefined;
+	};
+	state: string;
+	activeAt?: string;
+	value: string;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromAlertsResult".
+ */
+export interface PromAlertsResult {
+	status: string;
+	data: PromAlerts;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromAlerts".
+ */
+export interface PromAlerts {
+	alerts: PromAlert[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "PromExemplarsResult".
+ */
+export interface PromExemplarsResult {
+	status: string;
+	data: unknown[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiQueryResult".
+ */
+export interface LokiQueryResult {
+	status: string;
+	data: LokiQueryData;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiQueryData".
+ */
+export interface LokiQueryData {
+	resultType: LokiResultType;
+	result: LokiResult;
+	stats: LokiStats;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiStats".
+ */
+export interface LokiStats {
+	ingester: LokiIngesterStats;
+	store: LokiStoreStats;
+	summary: LokiSummaryStats;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiIngesterStats".
+ */
+export interface LokiIngesterStats {
+	compressedBytes: number;
+	decompressedBytes: number;
+	decompressedLines: number;
+	headChunkBytes: number;
+	headChunkLines: number;
+	totalBatches: number;
+	totalChunksMatched: number;
+	totalDuplicates: number;
+	totalLinesSent: number;
+	totalReached: number;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiStoreStats".
+ */
+export interface LokiStoreStats {
+	compressedBytes: number;
+	decompressedBytes: number;
+	decompressedLines: number;
+	chunksDownloadTime: number;
+	totalChunksRef: number;
+	totalChunksDownloaded: number;
+	totalDuplicates: number;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiSummaryStats".
+ */
+export interface LokiSummaryStats {
+	bytesProcessedPerSecond: number;
+	execTime: number;
+	linesProcessedPerSecond: number;
+	queueTime: number;
+	totalBytesProcessed: number;
+	totalLinesProcessed: number;
+	totalEntriesReturned: number;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiLabelsResult".
+ */
+export interface LokiLabelsResult {
+	status: string;
+	data: string[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiSeriesResult".
+ */
+export interface LokiSeriesResult {
+	status: string;
+	data: {
+		[k: string]: string | undefined;
+	}[];
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiIndexStats".
+ */
+export interface LokiIndexStats {
+	streams: number;
+	chunks: number;
+	entries: number;
+	bytes: number;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiVolumeResult".
+ */
+export interface LokiVolumeResult {
+	status: string;
+	data: LokiVolumeData;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiVolumeData".
+ */
+export interface LokiVolumeData {
+	resultType: LokiResultType;
+	result: LokiResult;
+}
+/**
+ * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema
+ * via the `definition` "LokiBuildInfo".
+ */
+export interface LokiBuildInfo {
+	version: string;
+	revision: string;
+	branch: string;
+	buildUser: string;
+	buildDate: string;
+	goVersion: string;
 }
 /**
  * This interface was referenced by `HttpsDivyDevSchemaIndexSchemaJson`'s JSON-Schema

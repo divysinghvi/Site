@@ -471,15 +471,23 @@ func TestCollect(t *testing.T) {
 			t.Errorf("hdr=%v: status=%d body=%s", hdr, res.StatusCode, body)
 		}
 	}
-	for _, method := range []string{"POST", "GET"} {
-		res, body := do(t, s, method, "/api/collect", map[string]string{"Authorization": "Bearer s3cret"})
+	// first round runs; a second round inside the collector's interval is
+	// reported as skipped (not due); force=1 runs it regardless
+	for _, c := range []struct {
+		method, path string
+		ok           bool
+	}{{"POST", "/api/collect", true}, {"GET", "/api/collect", false}, {"GET", "/api/collect?force=1", true}} {
+		res, body := do(t, s, c.method, c.path, map[string]string{"Authorization": "Bearer s3cret"})
 		if res.StatusCode != 200 || res.Header.Get("Cache-Control") != CacheNS {
-			t.Fatalf("%s: status=%d body=%s", method, res.StatusCode, body)
+			t.Fatalf("%s %s: status=%d body=%s", c.method, c.path, res.StatusCode, body)
 		}
 		var sum model.CollectSummary
 		decode(t, body, &sum)
-		if len(sum.Collectors) != 1 || sum.Collectors[0].Name != "process" || !sum.Collectors[0].OK || sum.BudgetMs != 2000 || sum.Truncated {
-			t.Errorf("%s: summary = %+v", method, sum)
+		if len(sum.Collectors) != 1 || sum.Collectors[0].Name != "process" || sum.Collectors[0].OK != c.ok || sum.BudgetMs != 2000 || sum.Truncated {
+			t.Errorf("%s %s: summary = %+v", c.method, c.path, sum)
+		}
+		if !c.ok && !strings.HasPrefix(sum.Collectors[0].Error, "skipped: not due") {
+			t.Errorf("%s %s: error = %q", c.method, c.path, sum.Collectors[0].Error)
 		}
 	}
 	runs, err := st.RecentRuns(context.Background(), "process", 10)

@@ -81,7 +81,12 @@
 	function writeHash(spanKey: string | undefined) {
 		if (typeof window === 'undefined') return;
 		const st = patchHash(parseHash(window.location.hash), { span: spanKey });
-		const url = window.location.pathname + window.location.search + formatHash(st);
+		// a `?span=` deep link (/trace/career?span=<id>) is consumed on load;
+		// the hash is the only place the selection lives afterwards
+		const q = new URLSearchParams(window.location.search);
+		q.delete('span');
+		const search = q.toString() ? '?' + q.toString() : '';
+		const url = window.location.pathname + search + formatHash(st);
 		try {
 			replaceState(url, page.state);
 		} catch {
@@ -138,29 +143,35 @@
 		view = null;
 	}
 
-	// #span=<id> (or the API's #trace?span=<id>) opens that span; applied on
-	// mount, on hash changes and on router-driven URL updates.
+	// #span=<id> (or the API's #trace?span=<id>, or ?span=<id> as postmortems
+	// and uptime link it) opens that span; applied on mount, on hash changes
+	// and on router-driven URL updates.
 	let mounted = $state(false);
-	function applyHash(hash: string) {
+	function spanFromUrl(hash: string, search: string): string | undefined {
 		const h = parseHash(hash);
-		if (!h.span) return;
-		const n = model.byKey.get(h.span) ?? model.byId.get(h.span);
+		if (h.span) return h.span;
+		return new URLSearchParams(search).get('span') || undefined;
+	}
+	function applyHash(hash: string, search = '') {
+		const key = spanFromUrl(hash, search);
+		if (!key) return;
+		const n = model.byKey.get(key) ?? model.byId.get(key);
 		if (n && selectedId !== n.id) {
 			expandTo(n);
 			select(n);
 		}
 	}
 	$effect(() => {
-		const hash = page.url.hash;
-		if (mounted) applyHash(hash);
+		const { hash, search } = page.url;
+		if (mounted) applyHash(hash, search);
 	});
 
 	onMount(() => {
 		nowUs = Date.now() * 1000;
 		const clock = setInterval(() => (nowUs = Date.now() * 1000), 60_000);
-		applyHash(window.location.hash);
+		applyHash(window.location.hash, window.location.search);
 		mounted = true;
-		const onhash = () => applyHash(window.location.hash);
+		const onhash = () => applyHash(window.location.hash, window.location.search);
 		window.addEventListener('hashchange', onhash);
 		const unbind = bindKeys('trace', {
 			j: () => moveFocus(1),

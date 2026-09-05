@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"divy.dev/internal/ascii"
+	"divy.dev/internal/collector"
 	"divy.dev/internal/model"
 )
 
@@ -31,7 +33,7 @@ func (s *Server) handleReadyz(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), time.Second)
 		lat, err := s.cfg.Store.Ping(ctx)
 		cancel()
-		body.Checks.DB = model.ReadyzDB{OK: err == nil, LatencyMs: float64(lat.Microseconds()) / 1000}
+		body.Checks.DB = model.ReadyzDB{OK: err == nil, LatencyMs: float64(lat.Microseconds()) / 1000, Storage: s.cfg.Storage}
 		if err != nil {
 			body.Checks.DB.Error = err.Error()
 			body.Status = "unavailable"
@@ -121,7 +123,14 @@ func (s *Server) handleCollect(w http.ResponseWriter, r *http.Request) {
 			budget = d
 		}
 	}
-	summary := s.cfg.Runner.RunRound(r.Context(), budget)
+	// Each collector keeps its own cadence even though the endpoint is called
+	// every five minutes: a collector whose last success is younger than its
+	// interval is reported as skipped. force=1 runs every collector.
+	onlyDue := true
+	if v := r.URL.Query().Get("force"); v == "1" || strings.EqualFold(v, "true") {
+		onlyDue = false
+	}
+	summary := s.cfg.Runner.RunRoundOpts(r.Context(), collector.RoundOptions{Budget: budget, OnlyDue: onlyDue, Now: s.cfg.Now})
 	writeJSON(w, http.StatusOK, CacheNS, summary)
 }
 
