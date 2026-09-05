@@ -9,17 +9,20 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log/slog"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync/atomic"
 	"syscall"
 	"time"
 	_ "time/tzdata" // Asia/Kolkata must load on distroless and Vercel
 
+	site "divy.dev"
 	"divy.dev/internal/ascii"
 	"divy.dev/internal/collector"
 	"divy.dev/internal/config"
@@ -125,6 +128,11 @@ func fail(stderr io.Writer, err error) int {
 
 // loadContent loads and validates content; on errors it prints the report and returns nil.
 func loadContent(dir, selfURL, origin string, strict bool, stderr io.Writer) (*content.Content, *content.Report) {
+	dir, err := resolveContentDir(dir, stderr)
+	if err != nil {
+		fmt.Fprintf(stderr, "divy: %v\n", err)
+		return nil, nil
+	}
 	c, err := content.Load(dir, content.Options{SelfURL: selfURL, SiteOrigin: origin})
 	if err != nil {
 		fmt.Fprintf(stderr, "divy: %v\n", err)
@@ -135,6 +143,48 @@ func loadContent(dir, selfURL, origin string, strict bool, stderr io.Writer) (*c
 		return nil, c.Report
 	}
 	return c, c.Report
+}
+
+// resolveContentDir returns dir when it exists on disk. When it does not (the
+// compiled function on Vercel ships without the source tree) or when dir is
+// "embedded", the content/ tree compiled into the binary is extracted once to
+// a temp directory and that path is returned.
+func resolveContentDir(dir string, stderr io.Writer) (string, error) {
+	if dir != "embedded" {
+		if st, err := os.Stat(dir); err == nil && st.IsDir() {
+			return dir, nil
+		}
+	}
+	efs := site.ContentFS()
+	if efs == nil {
+		return "", fmt.Errorf("content directory %q not found and no embedded content", dir)
+	}
+	out := filepath.Join(os.TempDir(), "divy-content-"+version.Commit)
+	marker := filepath.Join(out, ".extracted")
+	if _, err := os.Stat(marker); err == nil {
+		return out, nil
+	}
+	if err := fs.WalkDir(efs, ".", func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		dst := filepath.Join(out, filepath.FromSlash(p))
+		if d.IsDir() {
+			return os.MkdirAll(dst, 0o755)
+		}
+		b, err := fs.ReadFile(efs, p)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(dst, b, 0o644)
+	}); err != nil {
+		return "", fmt.Errorf("extract embedded content: %w", err)
+	}
+	if err := os.WriteFile(marker, []byte(version.Commit+"\n"), 0o644); err != nil {
+		return "", err
+	}
+	fmt.Fprintf(stderr, "divy: content directory %q not found; using the embedded copy at %s\n", dir, out)
+	return out, nil
 }
 
 // ---- serve ----

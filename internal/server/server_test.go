@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"divy.dev/internal/collector"
@@ -43,7 +44,7 @@ func newTestServer(t *testing.T, withStore bool) (*Server, *store.Store) {
 		_ = reg.Register(collector.Process{})
 		runner = &collector.Runner{Store: st, Registry: reg}
 	}
-	s, err := New(Config{Content: c, Store: st, Runner: runner, Version: "v0.1.0-test", Commit: "abc1234", SiteOrigin: "https://example.vercel.app", CollectTokens: []string{"s3cret"}, CollectBudget: 2 * time.Second, Now: func() time.Time { return frozen }})
+	s, err := New(Config{Content: c, Store: st, Runner: runner, SiteFS: fstest.MapFS{}, Version: "v0.1.0-test", Commit: "abc1234", SiteOrigin: "https://example.vercel.app", CollectTokens: []string{"s3cret"}, CollectBudget: 2 * time.Second, Now: func() time.Time { return frozen }})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +128,7 @@ func TestReadyz(t *testing.T) {
 func TestReadyzShuttingDownAndNoStore(t *testing.T) {
 	c := content.MustLoad("../content/testdata/valid", content.Options{Now: frozen})
 	down := false
-	s, err := New(Config{Content: c, ShuttingDown: func() bool { return down }})
+	s, err := New(Config{Content: c, SiteFS: fstest.MapFS{}, ShuttingDown: func() bool { return down }})
 	if err != nil {
 		t.Fatal(err)
 	}

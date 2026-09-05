@@ -25,7 +25,11 @@ type staticHandler struct {
 }
 
 func newStaticHandler(s *Server) (*staticHandler, error) {
-	h := &staticHandler{s: s, fsys: web.FS(), etags: map[string]string{}}
+	fsys := s.cfg.SiteFS
+	if fsys == nil {
+		fsys = web.FS()
+	}
+	h := &staticHandler{s: s, fsys: fsys, etags: map[string]string{}}
 	if h.fsys == nil {
 		return h, nil
 	}

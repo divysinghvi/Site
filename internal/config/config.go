@@ -67,6 +67,15 @@ func FromEnv(getenv func(string) string) (Config, error) {
 		UptimeSelfURL:   get("UPTIME_SELF_URL", ""),
 		OTelServiceName: get("OTEL_SERVICE_NAME", "divy-api"),
 	}
+	// On Vercel the production URL is a system env var; use it when SITE_ORIGIN is unset.
+	if c.SiteOrigin == "" {
+		for _, k := range []string{"VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_URL"} {
+			if h := strings.TrimSpace(getenv(k)); h != "" {
+				c.SiteOrigin = "https://" + strings.TrimPrefix(strings.TrimPrefix(h, "https://"), "http://")
+				break
+			}
+		}
+	}
 	if p := strings.TrimSpace(getenv("PORT")); p != "" {
 		c.Addr = ":" + strings.TrimPrefix(p, ":")
 	}
@@ -145,6 +154,11 @@ func resolveDBURL(getenv func(string) string) string {
 	}
 	if u := strings.TrimSpace(getenv("DIVY_DB_URL")); u != "" {
 		return u
+	}
+	// Vercel functions have a read-only bundle and a writable /tmp; without a
+	// database URL the store is ephemeral there (readyz/logs say so).
+	if strings.TrimSpace(getenv("VERCEL")) != "" {
+		return "file:/tmp/divy.db"
 	}
 	return "file:./data/divy.db"
 }

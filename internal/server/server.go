@@ -10,6 +10,7 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -41,6 +42,8 @@ type Config struct {
 	Branch    string
 	BuildUser string
 	BuildDate string
+	// SiteFS overrides the embedded site (tests); nil = the build embedded by internal/web.
+	SiteFS fs.FS
 	// SiteOrigin is the absolute origin used in robots.txt, og_image and the ASCII footer (SITE_ORIGIN).
 	SiteOrigin string
 	// CollectTokens are the bearer tokens accepted by /api/collect (DIVY_COLLECT_TOKEN, CRON_SECRET).

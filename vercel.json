@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "go",
+  "buildCommand": "bash deploy/vercel-build.sh",
+  "functions": {
+    "cmd/api/main.go": { "maxDuration": 60 }
+  },
+  "crons": [
+    { "path": "/api/collect", "schedule": "0 3 * * *" }
+  ]
+}
