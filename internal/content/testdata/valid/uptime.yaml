@@ -1,0 +1,22 @@
+targets:
+  - id: savely-landing
+    name: Savely landing page
+    url: TODO(divy)
+    span: project.savely
+  - id: codemind-demo
+    name: CodeMind demo
+    url: TODO(divy)
+    span: project.codemind
+  - id: pypi-codemind
+    name: codemind-ci on PyPI
+    url: https://pypi.org/project/codemind-ci/
+    span: project.codemind
+  - id: github-profile
+    name: GitHub profile
+    url: https://github.com/divysinghvi
+    method: HEAD
+  - id: self-api
+    name: divy.dev API (self)
+    url: https://example.vercel.app/readyz
+    timeout: 5s
+    note: "probed from the same function: a full outage shows as a gap, not red"

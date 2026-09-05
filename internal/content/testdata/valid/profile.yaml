@@ -1,0 +1,26 @@
+name: Divy
+handle: divysinghvi
+location: Rajasthan, India
+tz: Asia/Kolkata
+open_to_work: true
+open_to: ["backend intern", "infra", "sre"]
+tagline: "TODO(divy): one-line tagline"
+
+links:
+  github: https://github.com/divysinghvi
+  email: TODO(divy)
+  linkedin: TODO(divy)
+  resume: TODO(divy)
+  calendar: TODO(divy)
+
+escalation:
+  - {step: 1, channel: email, target: TODO(divy), response_time: TODO(divy), note: "preferred for roles and internships"}
+  - {step: 2, channel: github, target: https://github.com/divysinghvi, response_time: TODO(divy), note: "open an issue on any repo; PRs welcome"}
+  - {step: 3, channel: linkedin, target: TODO(divy), response_time: TODO(divy)}
+  - {step: 4, channel: calendar, target: TODO(divy), response_time: "next free slot", note: "book directly"}
+
+pods:
+  - {name: gradr-observability, ready: "1/1", status: Running, restarts_from: postmortems, span: gradr.observability}
+  - {name: savely,              ready: "1/1", status: Running, restarts_from: none, span: project.savely, note: "5000+ users"}
+  - {name: codemind-ci,         ready: "1/1", status: Running, restarts_from: none, span: project.codemind, note: "v0.2.0 on PyPI"}
+  - {name: lfx-velero,          ready: "0/1", status: Pending, restarts_from: none, span: oss.lfx-velero-application}

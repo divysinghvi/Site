@@ -1,0 +1,63 @@
+version: 1
+dashboard:
+  title: divy.dev — career metrics
+  refresh: 60s
+  time: {default: 1y, options: [24h, 7d, 30d, 1y, all]}
+
+panels:
+  - id: stat-experience
+    title: Years of experience
+    type: stat
+    gridPos: {x: 0, y: 0, w: 6, h: 4}
+    targets: [{refId: A, expr: divy_experience_years, instant: true}]
+    unit: none
+    decimals: 1
+    description: Years since the earliest dated work span (services flagged counts_as_experience in spans.yaml). Grows every second.
+    source: {kind: content, note: "derived from content/spans.yaml at request time; TODO(divy) dates are skipped"}
+    options: {graph_mode: none, color_mode: value}
+
+  - id: stat-merged-prs
+    title: Merged PRs
+    type: stat
+    gridPos: {x: 6, y: 0, w: 6, h: 4}
+    targets: [{refId: A, expr: sum(github_merged_prs_total), instant: true}]
+    unit: short
+    description: All merged pull requests authored by divysinghvi across orgs (private orgs counted, never named).
+    source: {kind: github, cadence: 15m, note: "GitHub search is:pr is:merged author:divysinghvi; cumulative counter backfilled from mergedAt"}
+    options: {graph_mode: area}
+
+  - id: stat-active-users
+    title: Active users
+    type: stat
+    gridPos: {x: 12, y: 0, w: 6, h: 4}
+    targets:
+      - {refId: A, expr: savely_active_users, instant: true}
+      - {refId: B, expr: 'divy_manual_metric_updated_timestamp_seconds{metric="savely_active_users"}', instant: true, hide: true}
+    unit: short
+    description: Savely Chrome extension users. Source is manual; the panel prints "last updated" from series B, or "unknown" if it is missing.
+    source: {kind: manual, note: "content/manual_metrics.yaml", updated_metric: 'divy_manual_metric_updated_timestamp_seconds{metric="savely_active_users"}'}
+    options: {graph_mode: none, color_mode: value}
+
+  - id: commits-weekly
+    title: GitHub commits — weekly rate
+    type: timeseries
+    gridPos: {x: 0, y: 4, w: 12, h: 8}
+    targets: [{refId: A, expr: 'sum(increase(github_commits_total[7d]))', legendFormat: commits / 7d}]
+    unit: short
+    decimals: 0
+    description: github_commits_total counts commits per day; increase over a 7-day window.
+    source: {kind: github, cadence: 15m, note: "contributionsCollection, last 365 days, backfilled daily"}
+
+  - id: lfx-pending
+    title: LFX applications pending
+    type: gauge
+    gridPos: {x: 12, y: 4, w: 12, h: 8}
+    targets:
+      - {refId: A, expr: 'lfx_applications{status="pending"}', instant: true}
+      - {refId: B, expr: 'divy_manual_metric_updated_timestamp_seconds{metric="lfx_applications"}', instant: true, hide: true}
+    unit: short
+    min: 0
+    max: 3
+    thresholds: {mode: absolute, steps: [{value: null, color: blue}, {value: 1, color: yellow}]}
+    description: LFX Mentorship 2026 Term 3 (Velero). Manual; see manual_metrics.yaml.
+    source: {kind: manual, note: "content/manual_metrics.yaml", updated_metric: 'divy_manual_metric_updated_timestamp_seconds{metric="lfx_applications"}'}

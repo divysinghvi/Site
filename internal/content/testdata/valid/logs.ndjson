@@ -1,0 +1,11 @@
+{"ts":"2023-01-01T00:00:00Z","precision":"year","level":"info","service":"edu","span":"edu.btech-ece","msg":"enrolled: B.Tech Electronics & Communication Engineering, CTAE Udaipur","expected_graduation":"2027"}
+{"ts":"2024-05-01T00:00:00Z","precision":"month","level":"info","service":"ef-polymer","span":"ef-polymer.swe-intern","msg":"joined EF Polymer Ltd. as Software Engineering Intern","sector":"agritech","company_country":"JP"}
+{"ts":"2025-07-01T00:00:00Z","precision":"month","level":"info","service":"ef-polymer","span":"ef-polymer.swe-intern","msg":"internship complete: Sales & Warehouse Management System deployed across multiple warehouses","team":"japan","months_with_team":12}
+{"ts":"2025-08-01T00:00:00Z","precision":"month","level":"info","service":"euro-tech","span":"euro-tech.go-iam-intern","msg":"joined Euro Technologies as Go/IAM Intern","lang":"go"}
+{"ts":"2025-11-01T00:00:00Z","precision":"month","level":"info","service":"euro-tech","span":"euro-tech.go-iam-intern","msg":"shipped Euro-IAM: multi-tenant OIDC, WebAuthn, TOTP, magic links, SSO","lang":"go","stack":"gin,gorm,postgres,redis,asynq"}
+{"ts":"2025-12-01T00:00:00Z","precision":"month","level":"info","service":"gradr","span":"gradr.intern","msg":"joined Gradr as Intern","company":"gradr.se","country":"SE"}
+{"ts":"2026-03-01T00:00:00Z","precision":"month","level":"info","service":"gradr","span":"gradr.product-engineer","msg":"promoted to Product Engineer","from":"intern"}
+{"ts":"TODO(divy)","level":"warn","service":"gradr","component":"secrets-sidecar","span":"gradr.inc-001","msg":"post-reboot race: secrets sidecar wrote .env after app containers started; Supabase-backed service down","incident":"INC-001","resolved":true}
+{"ts":"TODO(divy)","level":"warn","service":"gradr","component":"dev-proxy","span":"gradr.inc-002","msg":"cascading memory exhaustion: sentry containers saturating swap","incident":"INC-002","containers_approx":65,"resolved":true}
+{"ts":"TODO(divy)","level":"debug","service":"oss","span":"oss.wasmedge-prep","msg":"first x86-64 asm routine of the 128-bit arithmetic library compiles","lang":"asm"}
+{"ts":"TODO(divy)","level":"debug","service":"quant","msg":"alpha submitted on WorldQuant BRAIN","platform":"brain"}

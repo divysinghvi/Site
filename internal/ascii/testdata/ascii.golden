@@ -1,0 +1,35 @@
+divy.career · 9f3a0703b53d5b0aae2fb3bdacea0ff6 · 2023-01-01 → now · 28 spans
+rendered 2026-09-05T00:00:00Z · 1 col ≈ 1.6 mo · ▓ dated  ░ TODO(divy)  ┄ open
+────────────────────────────────────────────────────────────────────────────────
+service    span                           2023   2024    2025   2026    2027
+divy       divy.career                    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓┄┄┄┄┄┄┄┄┄┄┄
+edu        └ edu.btech-ece                ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓┄┄┄┄┄┄┄┄┄┄┄
+freelance  └ freelance.web-dev            ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+oss        └ oss.kubeflow                 ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+oss        └ oss.lfx-velero-application   ░░░░░░░░░░░░░░░░░░░░░░░░░░░┄┄┄┄┄┄┄┄┄┄┄
+oss        └ oss.minikube                 ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+oss          └ oss.minikube.pr-01         ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+oss          └ oss.minikube.pr-02         ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+oss        └ oss.wasmedge-prep            ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+project    └ project.codemind             ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+project    └ project.savely               ░░░░░░░░░░░░░░░░░░░░░░░░░░░┄┄┄┄┄┄┄┄┄┄┄
+quant      └ quant.worldquant-iqc         ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ef-polymer └ ef-polymer.swe-intern                  ▓▓▓▓▓▓▓▓▓
+ef-polymer   └ japan.onsite                         ░░░░░░░░░
+ef-polymer   └ sales-wms.build                      ░░░░░░░░░
+ef-polymer   └ sales-wms.multi-warehouse…           ░░░░░░░░░
+euro-tech  └ euro-tech.go-iam-intern                         ▓▓▓
+euro-tech    └ euro-iam.asynq-workers                        ░░░
+euro-tech    └ euro-iam.oidc-core                            ░░░
+euro-tech    └ euro-iam.webauthn                             ░░░
+gradr      └ gradr.intern                                       ▓▓
+gradr      └ gradr.product-engineer                               ▓▓▓┄┄┄┄┄┄┄┄┄┄┄
+gradr        └ gradr.observability                                ░░░┄┄┄┄┄┄┄┄┄┄┄
+gradr          └ gradr.inc-001 [ERR]                              ░░░
+gradr          └ gradr.inc-002 [ERR]                              ░░░
+gradr          └ gradr.inc-003 [ERR]                              ░░░
+gradr          └ gradr.inc-004 [ERR]                              ░░░
+gradr        └ gradr.product-features                             ░░░┄┄┄┄┄┄┄┄┄┄┄
+────────────────────────────────────────────────────────────────────────────────
+JSON: curl -s https://example.vercel.app/api/traces/career | jq .data[0].spans
+logs: /loki/api/v1/query_range?query={service="gradr"}   metrics: /metrics
