@@ -587,6 +587,38 @@ func (s *Store) Operations(ctx context.Context, service string, sinceNano int64)
 	return out, rows.Err()
 }
 
+// OperationKind is a span name with the span.kind attribute of one of its spans.
+type OperationKind struct {
+	Name string
+	Kind string
+}
+
+// OperationKinds returns distinct span names of a service since sinceNano with their span.kind.
+func (s *Store) OperationKinds(ctx context.Context, service string, sinceNano int64) ([]OperationKind, error) {
+	rows, err := s.r.QueryContext(ctx, "SELECT name, attributes FROM otel_spans WHERE service = ? AND start_unix_nano >= ? GROUP BY name ORDER BY name", service, sinceNano)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []OperationKind
+	for rows.Next() {
+		var ok OperationKind
+		var attrs string
+		if err := rows.Scan(&ok.Name, &attrs); err != nil {
+			return nil, err
+		}
+		var m map[string]any
+		_ = json.Unmarshal([]byte(attrs), &m)
+		if k, _ := m["span.kind"].(string); k != "" {
+			ok.Kind = k
+		} else {
+			ok.Kind = "internal"
+		}
+		out = append(out, ok)
+	}
+	return out, rows.Err()
+}
+
 // ---- collector runs and state ----
 
 // CollectorRun is one collector_runs row.
