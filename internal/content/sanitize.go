@@ -58,6 +58,10 @@ func (l *loader) sanitizeFile(file, text string) {
 			if p.skipFences && inFence {
 				continue
 			}
+			// profile.yaml is the public contact card: its own email/phone are intentional.
+			if strings.HasSuffix(file, "profile.yaml") && (p.name == "looks like an email address" || p.name == "looks like a phone number") {
+				continue
+			}
 			for _, m := range p.re.FindAllString(ln, -1) {
 				if p.allowTodo && (strings.Contains(m, TodoMarker) || reservedDomain(m)) {
 					continue

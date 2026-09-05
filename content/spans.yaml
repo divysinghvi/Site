@@ -25,6 +25,7 @@ trace:
     role: student + part-time product engineer
     location: "Rajasthan, India"
     stack: [sveltekit, prisma, python, fastapi, go, docker, caddy, hetzner, postgres, redis, prometheus, loki, grafana, sentry]
+    languages: [java, python, go, javascript, typescript, sql, dart]
     interests: [x86-64 asm, webassembly, llvm, competitive programming, quant finance]
     open_to: [backend intern, infra, sre]
   children:
@@ -33,7 +34,7 @@ trace:
       service: edu
       title: B.Tech Electronics & Communication Engineering — College of Technology and Engineering, Udaipur
       start: "2023"
-      end: "2027"            # planned graduation; open: true keeps the bar dashed up to it
+      end: "2027-05"            # planned graduation; open: true keeps the bar dashed up to it
       open: true
       tags: {role: student, location: "Udaipur, India"}
       todo:
@@ -59,7 +60,10 @@ trace:
         role: Software Engineering Intern
         stack: TODO(divy)
         lang: TODO(divy)
-        location: remote + on-site Japan
+        location: "hybrid — India"
+        work_mode: hybrid
+        company_valuation: "$70M+"
+        impact: "manual data entry −40%, mis-shipped products −20%"
         sector: agritech
       events:
         - {ts: TODO(divy), name: first prod deploy, attrs: {system: sales-wms}}
@@ -71,8 +75,8 @@ trace:
           title: Sales & Warehouse Management System — build
           start: TODO(divy)
           end: TODO(divy)
-          tags: {role: developer, stack: TODO(divy), lang: TODO(divy)}
-          todo: ["TODO(divy): build months; modules built (sales, inventory, …)"]
+          tags: {role: developer, stack: TODO(divy), lang: TODO(divy), features: [inventory tracking, analytics, stock-movement back-tracing]}
+          todo: ["TODO(divy): build months"]
         - id: sales-wms.multi-warehouse-rollout
           service: ef-polymer
           title: Sales & Warehouse Management System — multi-warehouse rollout
@@ -80,29 +84,23 @@ trace:
           end: TODO(divy)
           tags: {role: developer}
           events:
-            - {ts: TODO(divy), name: deployed across multiple warehouses, attrs: {warehouses: "TODO(divy)"}}
+            - {ts: TODO(divy), name: deployed across multiple warehouses, attrs: {warehouses: "TODO(divy)", manual_data_entry: "−40%", mis_shipped_products: "−20%"}}
           todo: ["TODO(divy): rollout months and warehouse count"]
-        - id: japan.onsite
-          service: ef-polymer
-          title: On-site with the Japanese team
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {location: Japan}
-          todo: ["TODO(divy): city and on-site dates (the collaboration with the team ran 12 months, remote + in person)"]
 
     # ---------------------------------------------------------------- Euro Technologies
     - id: euro-tech.go-iam-intern
       service: euro-tech
-      title: Go/IAM Intern — Euro Technologies
+      title: Golang Developer Intern (IAM) — Euro Technologies
       start: "2025-08"
       end: "2025-11"
       tags:
-        role: Go/IAM Intern
+        role: Golang Developer Intern
         stack: [go, gin, gorm, postgres, redis, asynq]
         lang: [go]
-        location: TODO(divy)
+        location: "on-site — TODO(divy): city"
+        work_mode: on-site
       events:
-        - {ts: "2025-11", name: shipped Euro-IAM, attrs: {features: "multi-tenant OIDC, WebAuthn, TOTP, magic links, SSO", built: from scratch}}
+        - {ts: "2025-11", name: shipped Euro-IAM, attrs: {features: "multi-tenant OIDC/OAuth2 flows, WebAuthn passkeys, TOTP MFA, magic links, SSO (Slack, GitHub, LinkedIn)", built: from scratch}}
       links:
         - {kind: repo, url: TODO(divy), label: Euro-IAM (if public)}
       children:
@@ -115,7 +113,7 @@ trace:
           todo: ["TODO(divy): months; which OIDC flows were implemented"]
         - id: euro-iam.webauthn
           service: euro-tech
-          title: Euro-IAM — WebAuthn, TOTP, magic links, SSO
+          title: Euro-IAM — WebAuthn passkeys, TOTP MFA, magic links, SSO (Slack, GitHub, LinkedIn)
           start: TODO(divy)
           end: TODO(divy)
           tags: {stack: [webauthn, totp, magic-links, sso], lang: [go]}
@@ -131,18 +129,18 @@ trace:
     # ---------------------------------------------------------------- Gradr
     - id: gradr.intern
       service: gradr
-      title: Intern — Gradr (gradr.se, Swedish EdTech startup)
+      title: Product Engineer Intern — Gradr (gradr.se, Swedish EdTech startup)
       start: "2025-12"
       end: "2026-03"
-      tags: {role: Intern, location: TODO(divy), stack: TODO(divy)}
-      todo: ["TODO(divy): remote or on-site; product stack; first shipped feature"]
+      tags: {role: Product Engineer Intern, location: "remote — Sweden", work_mode: remote, stack: [sveltekit, prisma, python], product: AI grading platform for educational institutions}
+      todo: ["TODO(divy): first shipped feature"]
 
     - id: gradr.product-engineer
       service: gradr
       title: Product Engineer (part-time) — Gradr
       start: "2026-03"
       open: true
-      tags: {role: Product Engineer (part-time), location: TODO(divy)}
+      tags: {role: Product Engineer (part-time), location: "remote — Sweden"}
       events:
         - {ts: "2026-03", name: promoted to Product Engineer, attrs: {from: intern}}
       children:
@@ -212,10 +210,11 @@ trace:
       title: CodeMind — persistent Cognee-powered memory layer for codebases (codemind-ci)
       start: TODO(divy)
       end: TODO(divy)
-      tags: {role: author, stack: [python, cognee, github-actions, pypi], lang: [python], hackathon: WeMakeDevs Cognee hackathon}
+      tags: {role: author, stack: [python, cognee, github-actions, pypi], lang: [python], hackathon: WeMakeDevs Cognee hackathon, tests: 19, ci_workflows: 3}
       events:
         - {ts: TODO(divy), name: submitted to the WeMakeDevs Cognee hackathon, attrs: {result: "TODO(divy)"}}
         - {ts: TODO(divy), name: published codemind-ci 0.2.0 to PyPI, attrs: {package: codemind-ci, version: 0.2.0}}
+        - {ts: TODO(divy), name: validated live against a production open-source repository, attrs: {repo: "TODO(divy)"}}
       links:
         - {kind: pypi, url: https://pypi.org/project/codemind-ci/, label: codemind-ci on PyPI}
         - {kind: repo, url: TODO(divy), label: source}
@@ -227,7 +226,7 @@ trace:
       title: Savely — Chrome price-comparison extension
       start: TODO(divy)
       open: true
-      tags: {role: author, stack: [fastapi, svelte, postgres, chrome-extension], lang: "TODO(divy): python + javascript/typescript (Svelte side)", users: "5000+"}
+      tags: {role: author, stack: [fastapi, svelte, postgres, chrome-extension], lang: "TODO(divy): python + javascript/typescript (Svelte side)", users: "5000+", scale: "5,000+ active users on the Chrome Web Store", techniques: [scraping engines, proxy rotation, response caching]}
       events:
         - {ts: TODO(divy), name: "5,000+ active users", attrs: {users: 5000, note: lower bound}}
       links:
@@ -235,13 +234,23 @@ trace:
         - {kind: url, url: TODO(divy), label: Chrome Web Store listing}
       todo: ["TODO(divy): launch month; still maintained? (else set end and open: false); user-count source"]
 
+    - id: project.self-healing-infra
+      service: project
+      title: Self-Healing Microservice Infrastructure
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: author, stack: [docker, kubernetes, django, prometheus], features: [automatic failure detection, self-healing container restarts, structured alerting]}
+      links:
+        - {kind: repo, url: TODO(divy), label: source}
+      todo: ["TODO(divy): months; repository URL"]
+
     # ---------------------------------------------------------------- quant
     - id: quant.worldquant-iqc
       service: quant
       title: WorldQuant International Quant Championship — Stage 1
       start: TODO(divy)
       end: TODO(divy)
-      tags: {role: participant, result: 2nd Prize, global_rank: 98, platform: WorldQuant BRAIN}
+      tags: {role: participant, result: 2nd Prize, prize: "$1,000", global_rank: 98, platform: WorldQuant BRAIN}
       events:
         - {ts: TODO(divy), name: 2nd Prize — Stage 1, attrs: {global_rank: 98}}
       todo: ["TODO(divy): competition months; prize announcement date; certificate/announcement URL"]
@@ -249,10 +258,10 @@ trace:
     # ---------------------------------------------------------------- open source
     - id: oss.minikube
       service: oss
-      title: kubernetes/minikube — 6 merged PRs (CNCF)
-      start: "2025-07-15"
-      end: "2025-11-30"
-      tags: {role: contributor, org: kubernetes, repo: kubernetes/minikube, lang: go, merged_prs: 6, source: git history}
+      title: kubernetes/minikube — Open Source Contributor (6 merged PRs, CNCF)
+      start: "2025-03"
+      open: true
+      tags: {role: Open Source Contributor, org: kubernetes, repo: kubernetes/minikube, lang: go, merged_prs: 6, source: git history, focus: [driver provisioning, binary generation, container networking, GitHub Actions CI, upstream review + RFC discussions]}
       events:
         - {ts: "2025-07-15", name: first PR merged, attrs: {pr: 21024}}
         - {ts: "2025-11-30", name: sixth PR merged, attrs: {pr: 21974}}
