@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -62,8 +63,13 @@ func TestRunRound(t *testing.T) {
 		<-ctx.Done()
 		return Result{}, ctx.Err()
 	}})
+	var mu sync.Mutex
 	var outcomes []string
-	r := &Runner{Store: st, Registry: reg, OnResult: func(name, outcome string, _ time.Duration) { outcomes = append(outcomes, name+"="+outcome) }}
+	r := &Runner{Store: st, Registry: reg, OnResult: func(name, outcome string, _ time.Duration) {
+		mu.Lock()
+		defer mu.Unlock()
+		outcomes = append(outcomes, name+"="+outcome)
+	}}
 	start := time.Now()
 	sum := r.RunRound(context.Background(), 300*time.Millisecond)
 	if el := time.Since(start); el > 2*time.Second {
@@ -132,7 +138,10 @@ func TestRunRound(t *testing.T) {
 	if len(sub.Collectors) != 1 || sub.Collectors[0].Name != "ok" || sub.Truncated {
 		t.Errorf("subset = %+v", sub)
 	}
-	if len(outcomes) == 0 {
+	mu.Lock()
+	n := len(outcomes)
+	mu.Unlock()
+	if n == 0 {
 		t.Error("OnResult hook not called")
 	}
 }

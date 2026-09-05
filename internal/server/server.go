@@ -1,7 +1,8 @@
 // Package server is the chi router of the divy binary: health, robots, the
 // ASCII negotiation on `/`, the content endpoints, the Jaeger trace endpoints,
-// the collect endpoint and the embedded static site. Prometheus, Loki and
-// /metrics handlers are mounted by their own packages through Mount hooks.
+// the collect endpoint, the Prometheus HTTP API (promapi.go), /metrics and
+// the embedded static site. Loki and the OTel/CORS/cache middlewares are
+// mounted by their own packages through the hooks.
 package server
 
 import (
@@ -19,8 +20,11 @@ import (
 
 	"divy.dev/internal/collector"
 	"divy.dev/internal/content"
+	"divy.dev/internal/metrics"
 	"divy.dev/internal/model"
+	"divy.dev/internal/promql"
 	"divy.dev/internal/store"
+	"divy.dev/internal/version"
 )
 
 // Config wires the server.
@@ -33,6 +37,10 @@ type Config struct {
 	Version   string
 	Commit    string
 	StartedAt time.Time
+	// Branch, BuildUser and BuildDate fill /api/v1/status/buildinfo (default: the version package).
+	Branch    string
+	BuildUser string
+	BuildDate string
 	// SiteOrigin is the absolute origin used in robots.txt, og_image and the ASCII footer (SITE_ORIGIN).
 	SiteOrigin string
 	// CollectTokens are the bearer tokens accepted by /api/collect (DIVY_COLLECT_TOKEN, CRON_SECRET).
@@ -48,6 +56,17 @@ type Config struct {
 	// Now overrides the clock (tests).
 	Now func() time.Time
 
+	// PromQL engine knobs (QUERY_LOOKBACK_DELTA, QUERY_TIMEOUT, QUERY_MAX_SAMPLES, QUERY_MAX_CONCURRENCY); zero = engine defaults.
+	QueryLookback       time.Duration
+	QueryTimeout        time.Duration
+	QueryMaxSamples     int
+	QueryMaxConcurrency int
+	// CollectorIntervals are the configured cadences used for the /metrics
+	// staleness cut-off; registered collectors and the catalogue defaults fill the gaps.
+	CollectorIntervals map[string]time.Duration
+	// Metrics is the client_golang registry; nil = a new one built here.
+	Metrics *metrics.Registry
+
 	// Hooks are the slots later packages fill; see Hooks.
 	Hooks Hooks
 }
@@ -55,7 +74,7 @@ type Config struct {
 // Hooks are the extension points of the middleware chain and router.
 //
 // The chain is: recover → Outer… → security headers → request context →
-// request log → GetHead → Inner… → routes. Fill Outer with the OTel
+// HTTP metrics → request log → GetHead → Inner… → routes. Fill Outer with the OTel
 // middleware and the X-Divy-Trace-Id header writer (they must run before
 // logging so the log line can carry the trace id) and Inner with client-IP
 // resolution, the per-IP rate limiter, CORS and the response cache (the
@@ -72,10 +91,13 @@ type Hooks struct {
 
 // Server is the HTTP handler.
 type Server struct {
-	cfg    Config
-	router chi.Router
-	static *staticHandler
-	log    *slog.Logger
+	cfg     Config
+	router  chi.Router
+	static  *staticHandler
+	log     *slog.Logger
+	metrics *metrics.Registry
+	live    *metrics.Live
+	prom    *promAPI
 }
 
 // Cache-Control classes (contract §K.3.2, Vercel adaptation: explicit s-maxage).
@@ -121,15 +143,54 @@ func New(cfg Config) (*Server, error) {
 	if cfg.Commit == "" {
 		cfg.Commit = "none"
 	}
+	if cfg.Branch == "" {
+		cfg.Branch = version.Branch
+	}
+	if cfg.BuildUser == "" {
+		cfg.BuildUser = version.BuildUser
+	}
+	if cfg.BuildDate == "" {
+		cfg.BuildDate = version.Date
+	}
 	s := &Server{cfg: cfg, log: cfg.Logger}
 	st, err := newStaticHandler(s)
 	if err != nil {
 		return nil, err
 	}
 	s.static = st
+	s.live = metrics.NewLive(cfg.Content, cfg.StartedAt, cfg.Version, cfg.Commit)
+	intervals := map[string]time.Duration{}
+	for k, v := range cfg.CollectorIntervals {
+		intervals[k] = v
+	}
+	if cfg.Runner != nil && cfg.Runner.Registry != nil {
+		for _, c := range cfg.Runner.Registry.Collectors() {
+			if _, ok := intervals[c.Name()]; !ok {
+				intervals[c.Name()] = c.Interval()
+			}
+		}
+	}
+	s.metrics = cfg.Metrics
+	if s.metrics == nil {
+		s.metrics = metrics.New(metrics.Options{Store: cfg.Store, Live: s.live, Intervals: intervals, Now: cfg.Now, Logger: cfg.Logger})
+	}
+	if cfg.Runner != nil && cfg.Runner.OnResult == nil {
+		cfg.Runner.OnResult = s.metrics.OnResult
+	}
+	engine := &promql.Engine{Live: s.live, Lookback: cfg.QueryLookback, Timeout: cfg.QueryTimeout, MaxSamples: cfg.QueryMaxSamples, MaxConcurrency: cfg.QueryMaxConcurrency}
+	if cfg.Store != nil {
+		engine.Storage = storeQuerier{st: cfg.Store}
+	}
+	s.prom = &promAPI{s: s, engine: engine, live: s.live}
 	s.router = s.buildRouter()
 	return s, nil
 }
+
+// Metrics returns the registry behind /metrics (the collector runner's OnResult hook).
+func (s *Server) Metrics() *metrics.Registry { return s.metrics }
+
+// Engine returns the PromQL engine (tests, the Loki family's shared clock).
+func (s *Server) Engine() *promql.Engine { return s.prom.engine }
 
 // ServeHTTP implements http.Handler.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) { s.router.ServeHTTP(w, r) }
@@ -142,6 +203,7 @@ func (s *Server) buildRouter() chi.Router {
 	r.Use(s.cfg.Hooks.Outer...)
 	r.Use(securityHeaders)
 	r.Use(requestContext)
+	r.Use(s.metrics.Middleware)
 	r.Use(s.requestLog)
 	r.Use(middleware.GetHead)
 	r.Use(s.cfg.Hooks.Inner...)
@@ -180,14 +242,20 @@ func (s *Server) buildRouter() chi.Router {
 	})
 	r.Get("/api/collect", s.handleCollect)
 	r.Post("/api/collect", s.handleCollect)
+	r.Method(http.MethodGet, "/metrics", s.metrics.Handler())
+	// The Prometheus family is a sub-router so that unknown paths answer the
+	// Prometheus 404 envelope and wrong methods 405 (contract K-X5, K.3.4).
+	r.Route("/api/v1", func(r chi.Router) {
+		r.NotFound(s.promNotFound)
+		r.MethodNotAllowed(s.methodNotAllowed)
+		s.prom.mount(r)
+	})
 
 	for _, m := range s.cfg.Hooks.Mount {
 		m(r)
 	}
 
 	// Unknown API paths never fall through to the static site (contract K-X5).
-	r.HandleFunc("/api/v1/*", s.promNotFound)
-	r.HandleFunc("/api/v1", s.promNotFound)
 	r.HandleFunc("/loki/*", s.lokiNotFound)
 	r.HandleFunc("/loki", s.lokiNotFound)
 	r.HandleFunc("/api/*", s.apiNotFound)

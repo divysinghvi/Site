@@ -5,6 +5,7 @@
 package content
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	"divy.dev/internal/model"
+	"divy.dev/internal/promql"
 	"divy.dev/internal/schemagen"
 )
 
@@ -28,9 +30,12 @@ type Options struct {
 	Now time.Time
 	// SelfURL replaces the url of the uptime target whose id is self-api (UPTIME_SELF_URL).
 	SelfURL string
+	// SiteOrigin expands the literal $SITE_ORIGIN in uptime target urls
+	// before validation (default http://localhost:8080).
+	SiteOrigin string
 	// Schemas are the compiled validators; nil = schemagen.MustCompile().
 	Schemas schemagen.Compiled
-	// CheckExpr validates a PromQL expression (panels.expr, alerts); nil skips the check.
+	// CheckExpr validates a PromQL expression (panels.expr, alerts); nil = the promql parser.
 	CheckExpr func(expr string) error
 }
 
@@ -99,6 +104,9 @@ func Load(dir string, opts Options) (*Content, error) {
 	if opts.Schemas == nil {
 		opts.Schemas = schemagen.MustCompile()
 	}
+	if opts.CheckExpr == nil {
+		opts.CheckExpr = promql.Check
+	}
 	st, err := os.Stat(dir)
 	if err != nil {
 		return nil, fmt.Errorf("content: %w", err)
@@ -155,6 +163,8 @@ type loader struct {
 	todos []model.TodoItem
 	raws  map[string][]byte   // rel file → bytes (for sanitizer)
 	docs  map[string]*yamlDoc // file name → parsed YAML (for line numbers)
+	// expand rewrites the JSON form of a document before validation (uptime $SITE_ORIGIN).
+	expand func([]byte) []byte
 }
 
 func (l *loader) rel(name string) string { return "content/" + name }
@@ -193,6 +203,9 @@ func (l *loader) loadYAMLInto(name, schema string, out any) *yamlDoc {
 		return nil
 	}
 	l.checkDatesQuoted(doc)
+	if l.expand != nil {
+		doc.json = l.expand(doc.json)
+	}
 	errs, err := validateJSON(l.opts.Schemas[schema], doc.json)
 	if err != nil {
 		l.c.Report.errorf(rel, 0, 0, "schema", "", "%v", err)
@@ -234,6 +247,12 @@ func (l *loader) loadManual()  { l.loadYAMLInto("manual_metrics.yaml", "manual_m
 func (l *loader) loadProfile() { l.loadYAMLInto("profile.yaml", "profile", &l.c.Profile) }
 
 func (l *loader) loadUptime() {
+	origin := strings.TrimRight(l.opts.SiteOrigin, "/")
+	if origin == "" {
+		origin = "http://localhost:8080"
+	}
+	l.expand = func(j []byte) []byte { return bytes.ReplaceAll(j, []byte("$SITE_ORIGIN"), []byte(origin)) }
+	defer func() { l.expand = nil }()
 	if l.loadYAMLInto("uptime.yaml", "uptime", &l.c.Uptime) == nil {
 		return
 	}

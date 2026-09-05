@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divy.dev/schema/profile.schema.json",
+  "$ref": "#/$defs/Profile",
+  "$defs": {
+    "Escalation": {
+      "properties": {
+        "step": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "response_time": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "step",
+        "channel",
+        "target",
+        "response_time"
+      ]
+    },
+    "Pod": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "ready": {
+          "type": "string",
+          "pattern": "^\\d+/\\d+$"
+        },
+        "status": {
+          "$ref": "#/$defs/PodStatus"
+        },
+        "restarts_from": {
+          "$ref": "#/$defs/RestartsFrom"
+        },
+        "span": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "ready",
+        "status",
+        "restarts_from",
+        "span"
+      ]
+    },
+    "PodStatus": {
+      "type": "string",
+      "enum": [
+        "Running",
+        "Pending",
+        "Completed",
+        "CrashLoopBackOff"
+      ]
+    },
+    "Profile": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tz": {
+          "type": "string",
+          "minLength": 1
+        },
+        "open_to_work": {
+          "type": "boolean"
+        },
+        "open_to": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/ProfileLinks"
+        },
+        "escalation": {
+          "items": {
+            "$ref": "#/$defs/Escalation"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "pods": {
+          "items": {
+            "$ref": "#/$defs/Pod"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "handle",
+        "location",
+        "tz",
+        "open_to_work",
+        "open_to",
+        "links",
+        "escalation",
+        "pods"
+      ]
+    },
+    "ProfileLinks": {
+      "properties": {
+        "github": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "linkedin": {
+          "type": "string"
+        },
+        "resume": {
+          "type": "string"
+        },
+        "calendar": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "github",
+        "email",
+        "linkedin",
+        "resume",
+        "calendar"
+      ]
+    },
+    "RestartsFrom": {
+      "type": "string",
+      "enum": [
+        "postmortems",
+        "none"
+      ]
+    }
+  }
+}

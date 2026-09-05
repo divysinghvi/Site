@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"divy.dev/internal/ascii"
@@ -127,13 +126,3 @@ func (s *Server) handleCollect(w http.ResponseWriter, r *http.Request) {
 }
 
 func fmtInt(n int) string { return fmt.Sprint(n) }
-
-func joinNonEmpty(parts ...string) string {
-	var out []string
-	for _, p := range parts {
-		if p != "" {
-			out = append(out, p)
-		}
-	}
-	return strings.Join(out, " ")
-}

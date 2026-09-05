@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divy.dev/schema/panels.schema.json",
+  "$ref": "#/$defs/PanelsFile",
+  "$defs": {
+    "Dashboard": {
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "refresh": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$"
+        },
+        "time": {
+          "$ref": "#/$defs/DashboardTime"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "title",
+        "time"
+      ]
+    },
+    "DashboardTime": {
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/TimeOption"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/TimeOption"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "default",
+        "options"
+      ]
+    },
+    "GridPos": {
+      "properties": {
+        "x": {
+          "type": "integer",
+          "maximum": 23,
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "maximum": 24,
+          "minimum": 1
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 2
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "w",
+        "h"
+      ]
+    },
+    "PaletteColor": {
+      "type": "string",
+      "enum": [
+        "green",
+        "yellow",
+        "red",
+        "blue",
+        "orange",
+        "purple"
+      ]
+    },
+    "Panel": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/PanelType"
+        },
+        "gridPos": {
+          "$ref": "#/$defs/GridPos"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "unit": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "stack": {
+          "type": "boolean"
+        },
+        "thresholds": {
+          "$ref": "#/$defs/Thresholds"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/PanelSource"
+        },
+        "options": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "type",
+        "gridPos",
+        "targets",
+        "description",
+        "source"
+      ]
+    },
+    "PanelSource": {
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SourceKind"
+        },
+        "cadence": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "updated_metric": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "kind"
+      ]
+    },
+    "PanelType": {
+      "type": "string",
+      "enum": [
+        "timeseries",
+        "stat",
+        "gauge",
+        "bargauge"
+      ]
+    },
+    "PanelsFile": {
+      "properties": {
+        "version": {
+          "type": "integer",
+          "maximum": 1,
+          "minimum": 1
+        },
+        "dashboard": {
+          "$ref": "#/$defs/Dashboard"
+        },
+        "panels": {
+          "items": {
+            "$ref": "#/$defs/Panel"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "version",
+        "dashboard",
+        "panels"
+      ]
+    },
+    "SourceKind": {
+      "type": "string",
+      "enum": [
+        "github",
+        "pypi",
+        "manual",
+        "process",
+        "content"
+      ]
+    },
+    "Target": {
+      "properties": {
+        "refId": {
+          "type": "string",
+          "pattern": "^[A-Z]$"
+        },
+        "expr": {
+          "type": "string",
+          "minLength": 1
+        },
+        "legendFormat": {
+          "type": "string"
+        },
+        "instant": {
+          "type": "boolean"
+        },
+        "hide": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "refId",
+        "expr"
+      ]
+    },
+    "ThresholdMode": {
+      "type": "string",
+      "enum": [
+        "absolute",
+        "percentage"
+      ]
+    },
+    "ThresholdStep": {
+      "properties": {
+        "value": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "$ref": "#/$defs/PaletteColor"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "value",
+        "color"
+      ]
+    },
+    "Thresholds": {
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/ThresholdMode"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/ThresholdStep"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "mode",
+        "steps"
+      ]
+    },
+    "TimeOption": {
+      "type": "string",
+      "enum": [
+        "24h",
+        "7d",
+        "30d",
+        "1y",
+        "all"
+      ]
+    }
+  }
+}

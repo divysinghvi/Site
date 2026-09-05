@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
@@ -20,14 +19,6 @@ type yamlDoc struct {
 	raw  []byte
 	root *yaml.Node
 	json []byte
-}
-
-func readYAML(path, rel string) (*yamlDoc, error) {
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	return parseYAML(rel, raw)
 }
 
 func parseYAML(rel string, raw []byte) (*yamlDoc, error) {

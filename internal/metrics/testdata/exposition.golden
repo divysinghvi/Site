@@ -1,0 +1,141 @@
+# HELP divy_build_info Build metadata of the running binary (value is always 1).
+# TYPE divy_build_info gauge
+divy_build_info{commit="abc1234",go_version="<go>",version="v0.1.0-test"} 1
+# HELP divy_collector_last_success_timestamp_seconds Unix time of the last successful run of a collector.
+# TYPE divy_collector_last_success_timestamp_seconds gauge
+# HELP divy_collector_run_duration_seconds Duration of collector runs in seconds, by collector.
+# TYPE divy_collector_run_duration_seconds histogram
+# HELP divy_collector_runs_total Collector runs by collector and result.
+# TYPE divy_collector_runs_total counter
+# HELP divy_experience_years Years since the start of the earliest span counted as experience, from content/spans.yaml.
+# TYPE divy_experience_years gauge
+divy_experience_years{} 2.346338124572211
+# HELP divy_http_request_duration_seconds HTTP request duration in seconds, by route and method.
+# TYPE divy_http_request_duration_seconds histogram
+# HELP divy_http_requests_total HTTP requests served by the API, by route, method and status code.
+# TYPE divy_http_requests_total counter
+# HELP divy_manual_metric_updated_timestamp_seconds Unix time at which a manually maintained metric was last updated.
+# TYPE divy_manual_metric_updated_timestamp_seconds gauge
+divy_manual_metric_updated_timestamp_seconds{metric="x-metric"} 2
+# HELP divy_open_to_work Whether Divy is open to work (1) or not (0), from content/profile.yaml.
+# TYPE divy_open_to_work gauge
+divy_open_to_work{} 1
+# HELP divy_uptime_seconds Seconds since the API process started.
+# TYPE divy_uptime_seconds gauge
+divy_uptime_seconds{} 90
+# HELP github_commits_total Cumulative commits by divysinghvi per day (GitHub contributionsCollection; private repositories counted, never named).
+# TYPE github_commits_total counter
+github_commits_total{} 2
+# HELP github_contributions_total Cumulative GitHub contributions per the contribution calendar (commits, issues, PRs, reviews).
+# TYPE github_contributions_total counter
+github_contributions_total{} 2
+# HELP github_merged_prs_by_repo_total Cumulative merged pull requests authored by divysinghvi, by public repository.
+# TYPE github_merged_prs_by_repo_total counter
+github_merged_prs_by_repo_total{org="x-org",repo="x-repo"} 2
+# HELP github_merged_prs_total Cumulative merged pull requests authored by divysinghvi, by repository owner.
+# TYPE github_merged_prs_total counter
+github_merged_prs_total{org="x-org"} 2
+# HELP github_stars Current stargazer count of a repository.
+# TYPE github_stars gauge
+github_stars{repo="savely"} 42
+github_stars{repo="x-repo"} 2
+# HELP go_gc_duration_seconds A summary of the wall-time pause (stop-the-world) duration in garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+# HELP go_gc_gogc_percent Heap size target percentage configured by the user, otherwise 100. This value is set by the GOGC environment variable, and the runtime/debug.SetGCPercent function. Sourced from /gc/gogc:percent.
+# TYPE go_gc_gogc_percent gauge
+# HELP go_gc_gomemlimit_bytes Go runtime memory limit configured by the user, otherwise math.MaxInt64. This value is set by the GOMEMLIMIT environment variable, and the runtime/debug.SetMemoryLimit function. Sourced from /gc/gomemlimit:bytes.
+# TYPE go_gc_gomemlimit_bytes gauge
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+# HELP go_memstats_alloc_bytes Number of bytes allocated in heap and currently in use. Equals to /memory/classes/heap/objects:bytes.
+# TYPE go_memstats_alloc_bytes gauge
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated in heap until now, even if released already. Equals to /gc/heap/allocs:bytes.
+# TYPE go_memstats_alloc_bytes_total counter
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table. Equals to /memory/classes/profiling/buckets:bytes.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+# HELP go_memstats_frees_total Total number of heap objects frees. Equals to /gc/heap/frees:objects + /gc/heap/tiny/allocs:objects.
+# TYPE go_memstats_frees_total counter
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata. Equals to /memory/classes/metadata/other:bytes.
+# TYPE go_memstats_gc_sys_bytes gauge
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and currently in use, same as go_memstats_alloc_bytes. Equals to /memory/classes/heap/objects:bytes.
+# TYPE go_memstats_heap_alloc_bytes gauge
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used. Equals to /memory/classes/heap/released:bytes + /memory/classes/heap/free:bytes.
+# TYPE go_memstats_heap_idle_bytes gauge
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use. Equals to /memory/classes/heap/objects:bytes + /memory/classes/heap/unused:bytes
+# TYPE go_memstats_heap_inuse_bytes gauge
+# HELP go_memstats_heap_objects Number of currently allocated objects. Equals to /gc/heap/objects:objects.
+# TYPE go_memstats_heap_objects gauge
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS. Equals to /memory/classes/heap/released:bytes.
+# TYPE go_memstats_heap_released_bytes gauge
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system. Equals to /memory/classes/heap/objects:bytes + /memory/classes/heap/unused:bytes + /memory/classes/heap/released:bytes + /memory/classes/heap/free:bytes.
+# TYPE go_memstats_heap_sys_bytes gauge
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+# HELP go_memstats_mallocs_total Total number of heap objects allocated, both live and gc-ed. Semantically a counter version for go_memstats_heap_objects gauge. Equals to /gc/heap/allocs:objects + /gc/heap/tiny/allocs:objects.
+# TYPE go_memstats_mallocs_total counter
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures. Equals to /memory/classes/metadata/mcache/inuse:bytes.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system. Equals to /memory/classes/metadata/mcache/inuse:bytes + /memory/classes/metadata/mcache/free:bytes.
+# TYPE go_memstats_mcache_sys_bytes gauge
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures. Equals to /memory/classes/metadata/mspan/inuse:bytes.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system. Equals to /memory/classes/metadata/mspan/inuse:bytes + /memory/classes/metadata/mspan/free:bytes.
+# TYPE go_memstats_mspan_sys_bytes gauge
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place. Equals to /gc/heap/goal:bytes.
+# TYPE go_memstats_next_gc_bytes gauge
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations. Equals to /memory/classes/other:bytes.
+# TYPE go_memstats_other_sys_bytes gauge
+# HELP go_memstats_stack_inuse_bytes Number of bytes obtained from system for stack allocator in non-CGO environments. Equals to /memory/classes/heap/stacks:bytes.
+# TYPE go_memstats_stack_inuse_bytes gauge
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator. Equals to /memory/classes/heap/stacks:bytes + /memory/classes/os-stacks:bytes.
+# TYPE go_memstats_stack_sys_bytes gauge
+# HELP go_memstats_sys_bytes Number of bytes obtained from system. Equals to /memory/classes/total:byte.
+# TYPE go_memstats_sys_bytes gauge
+# HELP go_sched_gomaxprocs_threads The current runtime.GOMAXPROCS setting, or the number of operating system threads that can execute user-level Go code simultaneously. Sourced from /sched/gomaxprocs:threads.
+# TYPE go_sched_gomaxprocs_threads gauge
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+# HELP lfx_applications LFX Mentorship applications by status (manual source).
+# TYPE lfx_applications gauge
+lfx_applications{status="x-status"} 2
+# HELP oss_prs_open Open pull requests authored by divysinghvi in repositories not owned by divysinghvi.
+# TYPE oss_prs_open gauge
+oss_prs_open{} 2
+# HELP probe_duration_seconds Duration of the last uptime probe of the target.
+# TYPE probe_duration_seconds gauge
+probe_duration_seconds{target="x-target"} 2
+# HELP probe_http_status_code HTTP status code returned by the last uptime probe of the target (0 on connection failure).
+# TYPE probe_http_status_code gauge
+probe_http_status_code{target="x-target"} 2
+# HELP probe_success Whether the last uptime probe of the target succeeded (1) or failed (0).
+# TYPE probe_success gauge
+probe_success{target="x-target"} 2
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+# HELP process_network_receive_bytes_total Number of bytes received by the process over the network.
+# TYPE process_network_receive_bytes_total counter
+# HELP process_network_transmit_bytes_total Number of bytes sent by the process over the network.
+# TYPE process_network_transmit_bytes_total counter
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+# HELP pypi_downloads_total Cumulative PyPI downloads (pypistats.org overall, mirrors excluded).
+# TYPE pypi_downloads_total counter
+pypi_downloads_total{package="x-package"} 2
+# HELP pypi_package_info Latest published version of a PyPI package (value is always 1).
+# TYPE pypi_package_info gauge
+pypi_package_info{package="x-package",version="x-version"} 2
+# HELP savely_active_users Active users of the Savely Chrome extension (manual source, lower bound).
+# TYPE savely_active_users gauge
+savely_active_users{} 2

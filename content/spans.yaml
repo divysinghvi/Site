@@ -197,7 +197,7 @@ trace:
               status: error
               tags: {component: sentry, incident: INC-004}
               events:
-                - {ts: TODO(divy), name: outage resolved, attrs: {incident: INC-004, fix: capture gate + fingerprinting fixed, alert hygiene}}
+                - {ts: TODO(divy), name: outage resolved, attrs: {incident: INC-004, fix: "capture gate + fingerprinting fixed, alert hygiene"}}
               links: [{kind: postmortem, ref: INC-004}]
         - id: gradr.product-features
           service: gradr
@@ -415,7 +415,7 @@ trace:
       open: true
       tags: {role: author, stack: [fastapi, svelte, postgres, chrome-extension], lang: "TODO(divy): python + javascript/typescript (Svelte side)", users: "5000+"}
       events:
-        - {ts: TODO(divy), name: 5,000+ active users, attrs: {users: 5000, note: lower bound}}
+        - {ts: TODO(divy), name: "5,000+ active users", attrs: {users: 5000, note: lower bound}}
       links:
         - {kind: url, url: TODO(divy), label: landing page}
         - {kind: url, url: TODO(divy), label: Chrome Web Store listing}

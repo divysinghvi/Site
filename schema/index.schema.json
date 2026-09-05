@@ -1,0 +1,3005 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divy.dev/schema/index.schema.json",
+  "$defs": {
+    "APIRoots": {
+      "properties": {
+        "JaegerTraceResponse": {
+          "$ref": "#/$defs/JaegerTraceResponse"
+        },
+        "JaegerStringsResponse": {
+          "$ref": "#/$defs/JaegerStringsResponse"
+        },
+        "JaegerOperationsResponse": {
+          "$ref": "#/$defs/JaegerOperationsResponse"
+        },
+        "Healthz": {
+          "$ref": "#/$defs/Healthz"
+        },
+        "Readyz": {
+          "$ref": "#/$defs/Readyz"
+        },
+        "ContentServices": {
+          "$ref": "#/$defs/ContentServices"
+        },
+        "ContentSpans": {
+          "$ref": "#/$defs/SpansFile"
+        },
+        "ContentPostmortemList": {
+          "$ref": "#/$defs/ContentPostmortemList"
+        },
+        "ContentPostmortem": {
+          "$ref": "#/$defs/ContentPostmortem"
+        },
+        "ContentPanels": {
+          "$ref": "#/$defs/PanelsFile"
+        },
+        "ContentAlerts": {
+          "$ref": "#/$defs/AlertsFile"
+        },
+        "ContentUptime": {
+          "$ref": "#/$defs/ContentUptime"
+        },
+        "ContentManualMetrics": {
+          "$ref": "#/$defs/ContentManualMetrics"
+        },
+        "ContentProfile": {
+          "$ref": "#/$defs/ContentProfile"
+        },
+        "ContentTodos": {
+          "$ref": "#/$defs/ContentTodos"
+        },
+        "UptimeHeartbeats": {
+          "$ref": "#/$defs/UptimeHeartbeats"
+        },
+        "CollectSummary": {
+          "$ref": "#/$defs/CollectSummary"
+        },
+        "PlainError": {
+          "$ref": "#/$defs/PlainError"
+        },
+        "PromError": {
+          "$ref": "#/$defs/PromError"
+        },
+        "PromQueryResult": {
+          "$ref": "#/$defs/PromQueryResult"
+        },
+        "PromSeriesResult": {
+          "$ref": "#/$defs/PromSeriesResult"
+        },
+        "PromLabelsResult": {
+          "$ref": "#/$defs/PromLabelsResult"
+        },
+        "PromMetadataResult": {
+          "$ref": "#/$defs/PromMetadataResult"
+        },
+        "PromBuildInfoResult": {
+          "$ref": "#/$defs/PromBuildInfoResult"
+        },
+        "PromRulesResult": {
+          "$ref": "#/$defs/PromRulesResult"
+        },
+        "PromAlertsResult": {
+          "$ref": "#/$defs/PromAlertsResult"
+        },
+        "PromExemplarsResult": {
+          "$ref": "#/$defs/PromExemplarsResult"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "JaegerTraceResponse",
+        "JaegerStringsResponse",
+        "JaegerOperationsResponse",
+        "Healthz",
+        "Readyz",
+        "ContentServices",
+        "ContentSpans",
+        "ContentPostmortemList",
+        "ContentPostmortem",
+        "ContentPanels",
+        "ContentAlerts",
+        "ContentUptime",
+        "ContentManualMetrics",
+        "ContentProfile",
+        "ContentTodos",
+        "UptimeHeartbeats",
+        "CollectSummary",
+        "PlainError",
+        "PromError",
+        "PromQueryResult",
+        "PromSeriesResult",
+        "PromLabelsResult",
+        "PromMetadataResult",
+        "PromBuildInfoResult",
+        "PromRulesResult",
+        "PromAlertsResult",
+        "PromExemplarsResult"
+      ]
+    },
+    "AlertGroup": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "interval": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/AlertRule"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "rules"
+      ]
+    },
+    "AlertRule": {
+      "properties": {
+        "alert": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9]*$"
+        },
+        "expr": {
+          "type": "string",
+          "minLength": 1
+        },
+        "for": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "alert",
+        "expr"
+      ]
+    },
+    "AlertsFile": {
+      "properties": {
+        "groups": {
+          "items": {
+            "$ref": "#/$defs/AlertGroup"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "groups"
+      ]
+    },
+    "CollectSummary": {
+      "properties": {
+        "collectors": {
+          "items": {
+            "$ref": "#/$defs/CollectorResult"
+          },
+          "type": "array"
+        },
+        "budget_ms": {
+          "type": "integer"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "collectors",
+        "budget_ms",
+        "truncated"
+      ]
+    },
+    "CollectorResult": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "integer"
+        },
+        "duration_ms": {
+          "type": "integer"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "ok",
+        "items",
+        "duration_ms"
+      ]
+    },
+    "ContentManualMetrics": {
+      "properties": {
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/ManualMetric"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "metrics"
+      ]
+    },
+    "ContentPostmortem": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^INC-[0-9]{3}$"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 90,
+          "minLength": 1
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "date": {
+          "$ref": "#/$defs/DateOrTodo"
+        },
+        "span": {
+          "type": "string"
+        },
+        "services": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "duration": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$|^TODO\\(divy\\)(: .+)?$"
+        },
+        "status": {
+          "$ref": "#/$defs/PostmortemStatus"
+        },
+        "tags": {
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 160,
+          "minLength": 1
+        },
+        "todo_count": {
+          "type": "integer"
+        },
+        "og_image": {
+          "type": "string"
+        },
+        "html": {
+          "type": "string"
+        },
+        "toc": {
+          "items": {
+            "$ref": "#/$defs/TOCEntry"
+          },
+          "type": "array"
+        },
+        "markdown": {
+          "type": "string"
+        },
+        "span_url": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "severity",
+        "date",
+        "span",
+        "services",
+        "duration",
+        "status",
+        "summary",
+        "todo_count",
+        "og_image",
+        "html",
+        "toc",
+        "markdown",
+        "span_url"
+      ]
+    },
+    "ContentPostmortemList": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/$defs/PostmortemSummary"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "items"
+      ]
+    },
+    "ContentProfile": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "handle": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "tz": {
+          "type": "string"
+        },
+        "open_to_work": {
+          "type": "boolean"
+        },
+        "open_to": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/ProfileLinks"
+        },
+        "escalation": {
+          "items": {
+            "$ref": "#/$defs/Escalation"
+          },
+          "type": "array"
+        },
+        "pods": {
+          "items": {
+            "$ref": "#/$defs/PodView"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "handle",
+        "location",
+        "tz",
+        "open_to_work",
+        "open_to",
+        "links",
+        "escalation",
+        "pods"
+      ]
+    },
+    "ContentServices": {
+      "properties": {
+        "services": {
+          "items": {
+            "$ref": "#/$defs/Service"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "services"
+      ]
+    },
+    "ContentTodos": {
+      "properties": {
+        "generated_at": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "by_file": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "type": "object"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/TodoItem"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "generated_at",
+        "count",
+        "by_file",
+        "items"
+      ]
+    },
+    "ContentUptime": {
+      "properties": {
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/UptimeTargetView"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "targets"
+      ]
+    },
+    "Dashboard": {
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "refresh": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$"
+        },
+        "time": {
+          "$ref": "#/$defs/DashboardTime"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "title",
+        "time"
+      ]
+    },
+    "DashboardTime": {
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/TimeOption"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/TimeOption"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "default",
+        "options"
+      ]
+    },
+    "DateOrTodo": {
+      "type": "string",
+      "pattern": "^(\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\\d|3[01]))?)?|TODO\\(divy\\)(: .+)?)$"
+    },
+    "Escalation": {
+      "properties": {
+        "step": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "response_time": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "step",
+        "channel",
+        "target",
+        "response_time"
+      ]
+    },
+    "Event": {
+      "properties": {
+        "ts": {
+          "$ref": "#/$defs/DateOrTodo"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attrs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Scalar"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ts",
+        "name"
+      ]
+    },
+    "GridPos": {
+      "properties": {
+        "x": {
+          "type": "integer",
+          "maximum": 23,
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "maximum": 24,
+          "minimum": 1
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 2
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "w",
+        "h"
+      ]
+    },
+    "Healthz": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "open_to": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "tz": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "open_to",
+        "tz"
+      ]
+    },
+    "HeartbeatBucket": {
+      "properties": {
+        "ts": {
+          "type": "string"
+        },
+        "samples": {
+          "type": "integer"
+        },
+        "up_ratio": {
+          "type": "number"
+        },
+        "avg_latency_ms": {
+          "type": "number"
+        },
+        "max_latency_ms": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ts",
+        "samples",
+        "up_ratio",
+        "avg_latency_ms",
+        "max_latency_ms"
+      ]
+    },
+    "HeartbeatTarget": {
+      "properties": {
+        "target": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "span": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/UptimeStatus"
+        },
+        "last": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ProbeLast"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "uptime": {
+          "$ref": "#/$defs/UptimeWindows"
+        },
+        "buckets": {
+          "items": {
+            "$ref": "#/$defs/HeartbeatBucket"
+          },
+          "type": "array"
+        },
+        "incidents": {
+          "items": {
+            "$ref": "#/$defs/UptimeIncident"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "target",
+        "name",
+        "url",
+        "span",
+        "status",
+        "last",
+        "uptime",
+        "buckets",
+        "incidents"
+      ]
+    },
+    "IntOrList": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      ]
+    },
+    "JaegerKeyValue": {
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": true
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "key",
+        "type",
+        "value"
+      ]
+    },
+    "JaegerLog": {
+      "properties": {
+        "timestamp": {
+          "type": "integer"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/JaegerKeyValue"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "timestamp",
+        "fields"
+      ]
+    },
+    "JaegerOperation": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "spanKind": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "spanKind"
+      ]
+    },
+    "JaegerOperationsResponse": {
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "#/$defs/JaegerOperation"
+          },
+          "type": "array"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "errors": {
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "data",
+        "total",
+        "limit",
+        "offset",
+        "errors"
+      ]
+    },
+    "JaegerProcess": {
+      "properties": {
+        "serviceName": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "$ref": "#/$defs/JaegerKeyValue"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "serviceName",
+        "tags"
+      ]
+    },
+    "JaegerReference": {
+      "properties": {
+        "refType": {
+          "type": "string"
+        },
+        "traceID": {
+          "type": "string"
+        },
+        "spanID": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "refType",
+        "traceID",
+        "spanID"
+      ]
+    },
+    "JaegerSpan": {
+      "properties": {
+        "traceID": {
+          "type": "string"
+        },
+        "spanID": {
+          "type": "string"
+        },
+        "operationName": {
+          "type": "string"
+        },
+        "references": {
+          "items": {
+            "$ref": "#/$defs/JaegerReference"
+          },
+          "type": "array"
+        },
+        "startTime": {
+          "type": "integer"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "tags": {
+          "items": {
+            "$ref": "#/$defs/JaegerKeyValue"
+          },
+          "type": "array"
+        },
+        "logs": {
+          "items": {
+            "$ref": "#/$defs/JaegerLog"
+          },
+          "type": "array"
+        },
+        "processID": {
+          "type": "string"
+        },
+        "warnings": {
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "traceID",
+        "spanID",
+        "operationName",
+        "references",
+        "startTime",
+        "duration",
+        "tags",
+        "logs",
+        "processID",
+        "warnings"
+      ]
+    },
+    "JaegerStringsResponse": {
+      "properties": {
+        "data": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "errors": {
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "data",
+        "total",
+        "limit",
+        "offset",
+        "errors"
+      ]
+    },
+    "JaegerTrace": {
+      "properties": {
+        "traceID": {
+          "type": "string"
+        },
+        "spans": {
+          "items": {
+            "$ref": "#/$defs/JaegerSpan"
+          },
+          "type": "array"
+        },
+        "processes": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JaegerProcess"
+          },
+          "type": "object"
+        },
+        "warnings": {
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "traceID",
+        "spans",
+        "processes",
+        "warnings"
+      ]
+    },
+    "JaegerTraceResponse": {
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "#/$defs/JaegerTrace"
+          },
+          "type": "array"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "errors": {
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "data",
+        "total",
+        "limit",
+        "offset",
+        "errors"
+      ]
+    },
+    "Link": {
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "postmortem"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "ref"
+            ]
+          },
+          "else": {
+            "required": [
+              "url"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/LinkKind"
+        },
+        "ref": {
+          "type": "string",
+          "pattern": "^INC-[0-9]{3}$"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "format": "uri"
+            },
+            {
+              "pattern": "^TODO\\(divy\\)"
+            }
+          ],
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "kind"
+      ]
+    },
+    "LinkKind": {
+      "type": "string",
+      "enum": [
+        "postmortem",
+        "repo",
+        "pr",
+        "pypi",
+        "url"
+      ]
+    },
+    "LogLevel": {
+      "type": "string",
+      "enum": [
+        "debug",
+        "info",
+        "warn",
+        "error"
+      ]
+    },
+    "LogLine": {
+      "properties": {
+        "ts": {
+          "anyOf": [
+            {
+              "pattern": "Z$",
+              "format": "date-time"
+            },
+            {
+              "pattern": "^TODO\\(divy\\)(: .+)?$"
+            }
+          ],
+          "type": "string"
+        },
+        "precision": {
+          "$ref": "#/$defs/LogPrecision"
+        },
+        "level": {
+          "$ref": "#/$defs/LogLevel"
+        },
+        "service": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "span": {
+          "type": "string"
+        },
+        "component": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        }
+      },
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean"
+        ]
+      },
+      "propertyNames": {
+        "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+      },
+      "type": "object",
+      "required": [
+        "ts",
+        "level",
+        "service",
+        "msg"
+      ]
+    },
+    "LogPrecision": {
+      "type": "string",
+      "enum": [
+        "day",
+        "month",
+        "year"
+      ]
+    },
+    "ManualMetric": {
+      "properties": {
+        "metric": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_:][a-zA-Z0-9_:]*$"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "value": {
+          "type": "number"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "updated_at": {
+          "$ref": "#/$defs/DateOrTodo"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "metric",
+        "value",
+        "source",
+        "updated_at"
+      ]
+    },
+    "ManualMetricsFile": {
+      "properties": {
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/ManualMetric"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "metrics"
+      ]
+    },
+    "PaletteColor": {
+      "type": "string",
+      "enum": [
+        "green",
+        "yellow",
+        "red",
+        "blue",
+        "orange",
+        "purple"
+      ]
+    },
+    "Panel": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/PanelType"
+        },
+        "gridPos": {
+          "$ref": "#/$defs/GridPos"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "unit": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "stack": {
+          "type": "boolean"
+        },
+        "thresholds": {
+          "$ref": "#/$defs/Thresholds"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/PanelSource"
+        },
+        "options": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "type",
+        "gridPos",
+        "targets",
+        "description",
+        "source"
+      ]
+    },
+    "PanelSource": {
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SourceKind"
+        },
+        "cadence": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "updated_metric": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "kind"
+      ]
+    },
+    "PanelType": {
+      "type": "string",
+      "enum": [
+        "timeseries",
+        "stat",
+        "gauge",
+        "bargauge"
+      ]
+    },
+    "PanelsFile": {
+      "properties": {
+        "version": {
+          "type": "integer",
+          "maximum": 1,
+          "minimum": 1
+        },
+        "dashboard": {
+          "$ref": "#/$defs/Dashboard"
+        },
+        "panels": {
+          "items": {
+            "$ref": "#/$defs/Panel"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "version",
+        "dashboard",
+        "panels"
+      ]
+    },
+    "PlainError": {
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "error"
+      ]
+    },
+    "Pod": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "ready": {
+          "type": "string",
+          "pattern": "^\\d+/\\d+$"
+        },
+        "status": {
+          "$ref": "#/$defs/PodStatus"
+        },
+        "restarts_from": {
+          "$ref": "#/$defs/RestartsFrom"
+        },
+        "span": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "ready",
+        "status",
+        "restarts_from",
+        "span"
+      ]
+    },
+    "PodStatus": {
+      "type": "string",
+      "enum": [
+        "Running",
+        "Pending",
+        "Completed",
+        "CrashLoopBackOff"
+      ]
+    },
+    "PodView": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "ready": {
+          "type": "string",
+          "pattern": "^\\d+/\\d+$"
+        },
+        "status": {
+          "$ref": "#/$defs/PodStatus"
+        },
+        "restarts_from": {
+          "$ref": "#/$defs/RestartsFrom"
+        },
+        "span": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "restarts": {
+          "type": "integer"
+        },
+        "age_s": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "ready",
+        "status",
+        "restarts_from",
+        "span",
+        "restarts",
+        "age_s"
+      ]
+    },
+    "PostmortemFrontmatter": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^INC-[0-9]{3}$"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 90,
+          "minLength": 1
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "date": {
+          "$ref": "#/$defs/DateOrTodo"
+        },
+        "span": {
+          "type": "string"
+        },
+        "services": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "duration": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$|^TODO\\(divy\\)(: .+)?$"
+        },
+        "status": {
+          "$ref": "#/$defs/PostmortemStatus"
+        },
+        "tags": {
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 160,
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "severity",
+        "date",
+        "span",
+        "services",
+        "duration",
+        "status",
+        "summary"
+      ]
+    },
+    "PostmortemStatus": {
+      "type": "string",
+      "enum": [
+        "resolved",
+        "monitoring",
+        "open"
+      ]
+    },
+    "PostmortemSummary": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^INC-[0-9]{3}$"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 90,
+          "minLength": 1
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "date": {
+          "$ref": "#/$defs/DateOrTodo"
+        },
+        "span": {
+          "type": "string"
+        },
+        "services": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "duration": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$|^TODO\\(divy\\)(: .+)?$"
+        },
+        "status": {
+          "$ref": "#/$defs/PostmortemStatus"
+        },
+        "tags": {
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 160,
+          "minLength": 1
+        },
+        "todo_count": {
+          "type": "integer"
+        },
+        "og_image": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "severity",
+        "date",
+        "span",
+        "services",
+        "duration",
+        "status",
+        "summary",
+        "todo_count",
+        "og_image"
+      ]
+    },
+    "ProbeLast": {
+      "properties": {
+        "ts": {
+          "type": "string"
+        },
+        "up": {
+          "type": "boolean"
+        },
+        "latency_ms": {
+          "type": "number"
+        },
+        "status_code": {
+          "type": "integer"
+        },
+        "error": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ts",
+        "up",
+        "latency_ms",
+        "status_code",
+        "error"
+      ]
+    },
+    "ProbeMethod": {
+      "type": "string",
+      "enum": [
+        "GET",
+        "HEAD"
+      ]
+    },
+    "Profile": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tz": {
+          "type": "string",
+          "minLength": 1
+        },
+        "open_to_work": {
+          "type": "boolean"
+        },
+        "open_to": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/ProfileLinks"
+        },
+        "escalation": {
+          "items": {
+            "$ref": "#/$defs/Escalation"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "pods": {
+          "items": {
+            "$ref": "#/$defs/Pod"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "handle",
+        "location",
+        "tz",
+        "open_to_work",
+        "open_to",
+        "links",
+        "escalation",
+        "pods"
+      ]
+    },
+    "ProfileLinks": {
+      "properties": {
+        "github": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "linkedin": {
+          "type": "string"
+        },
+        "resume": {
+          "type": "string"
+        },
+        "calendar": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "github",
+        "email",
+        "linkedin",
+        "resume",
+        "calendar"
+      ]
+    },
+    "PromAlert": {
+      "properties": {
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "state": {
+          "type": "string"
+        },
+        "activeAt": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "labels",
+        "annotations",
+        "state",
+        "value"
+      ]
+    },
+    "PromAlertingRule": {
+      "properties": {
+        "state": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "keepFiringFor": {
+          "type": "number"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "alerts": {
+          "items": {
+            "$ref": "#/$defs/PromAlert"
+          },
+          "type": "array"
+        },
+        "health": {
+          "type": "string"
+        },
+        "evaluationTime": {
+          "type": "number"
+        },
+        "lastEvaluation": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "state",
+        "name",
+        "query",
+        "duration",
+        "keepFiringFor",
+        "labels",
+        "annotations",
+        "alerts",
+        "health",
+        "evaluationTime",
+        "lastEvaluation",
+        "type"
+      ]
+    },
+    "PromAlerts": {
+      "properties": {
+        "alerts": {
+          "items": {
+            "$ref": "#/$defs/PromAlert"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "alerts"
+      ]
+    },
+    "PromAlertsResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/PromAlerts"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "PromBuildInfo": {
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "buildUser": {
+          "type": "string"
+        },
+        "buildDate": {
+          "type": "string"
+        },
+        "goVersion": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "version",
+        "revision",
+        "branch",
+        "buildUser",
+        "buildDate",
+        "goVersion"
+      ]
+    },
+    "PromBuildInfoResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/PromBuildInfo"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "PromError": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "errorType": {
+          "$ref": "#/$defs/PromErrorType"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "errorType",
+        "error"
+      ]
+    },
+    "PromErrorType": {
+      "type": "string",
+      "enum": [
+        "bad_data",
+        "execution",
+        "timeout",
+        "internal",
+        "unavailable",
+        "not_found"
+      ]
+    },
+    "PromExemplarsResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "items": true,
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "PromLabelsResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "PromMetadata": {
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "help": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "type",
+        "help",
+        "unit"
+      ]
+    },
+    "PromMetadataResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/PromMetadata"
+            },
+            "type": "array"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "PromQueryData": {
+      "properties": {
+        "resultType": {
+          "$ref": "#/$defs/PromResultType"
+        },
+        "result": {
+          "$ref": "#/$defs/PromResult"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "resultType",
+        "result"
+      ]
+    },
+    "PromQueryResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/PromQueryData"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "PromResult": {
+      "oneOf": [
+        {
+          "items": {
+            "properties": {
+              "metric": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "value": {
+                "items": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              }
+            },
+            "type": "object",
+            "required": [
+              "metric",
+              "value"
+            ]
+          },
+          "type": "array"
+        },
+        {
+          "items": {
+            "properties": {
+              "metric": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "values": {
+                "items": {
+                  "items": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2
+                },
+                "type": "array"
+              }
+            },
+            "type": "object",
+            "required": [
+              "metric",
+              "values"
+            ]
+          },
+          "type": "array"
+        },
+        {
+          "items": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "type": "array",
+          "maxItems": 2,
+          "minItems": 2
+        }
+      ]
+    },
+    "PromResultType": {
+      "type": "string",
+      "enum": [
+        "vector",
+        "matrix",
+        "scalar",
+        "string"
+      ]
+    },
+    "PromRuleGroup": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/PromAlertingRule"
+          },
+          "type": "array"
+        },
+        "interval": {
+          "type": "number"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "evaluationTime": {
+          "type": "number"
+        },
+        "lastEvaluation": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "file",
+        "rules",
+        "interval",
+        "limit",
+        "evaluationTime",
+        "lastEvaluation"
+      ]
+    },
+    "PromRuleGroups": {
+      "properties": {
+        "groups": {
+          "items": {
+            "$ref": "#/$defs/PromRuleGroup"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "groups"
+      ]
+    },
+    "PromRulesResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/PromRuleGroups"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "PromSeriesResult": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "data"
+      ]
+    },
+    "ReadyStatus": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "unavailable",
+        "shutting_down"
+      ]
+    },
+    "Readyz": {
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ReadyStatus"
+        },
+        "version": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "uptime_s": {
+          "type": "integer"
+        },
+        "checks": {
+          "$ref": "#/$defs/ReadyzChecks"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "status",
+        "version",
+        "commit",
+        "uptime_s",
+        "checks"
+      ]
+    },
+    "ReadyzChecks": {
+      "properties": {
+        "db": {
+          "$ref": "#/$defs/ReadyzDB"
+        },
+        "content": {
+          "$ref": "#/$defs/ReadyzContent"
+        },
+        "collectors": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ReadyzCollector"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "db",
+        "content",
+        "collectors"
+      ]
+    },
+    "ReadyzCollector": {
+      "properties": {
+        "ok": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_success": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "age_s": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stale_after_s": {
+          "type": "integer"
+        },
+        "disabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ok",
+        "last_success",
+        "age_s",
+        "stale_after_s"
+      ]
+    },
+    "ReadyzContent": {
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "files": {
+          "type": "integer"
+        },
+        "spans": {
+          "type": "integer"
+        },
+        "log_lines": {
+          "type": "integer"
+        },
+        "todos": {
+          "type": "integer"
+        },
+        "loaded_at": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ok",
+        "files",
+        "spans",
+        "log_lines",
+        "todos",
+        "loaded_at"
+      ]
+    },
+    "ReadyzDB": {
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "latency_ms": {
+          "type": "number"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ok",
+        "latency_ms"
+      ]
+    },
+    "RestartsFrom": {
+      "type": "string",
+      "enum": [
+        "postmortems",
+        "none"
+      ]
+    },
+    "Scalar": {
+      "type": [
+        "string",
+        "number",
+        "boolean"
+      ]
+    },
+    "Service": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-f]{6}$"
+        },
+        "counts_as_experience": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "color"
+      ]
+    },
+    "Severity": {
+      "type": "string",
+      "enum": [
+        "SEV1",
+        "SEV2",
+        "SEV3",
+        "SEV4"
+      ]
+    },
+    "SourceKind": {
+      "type": "string",
+      "enum": [
+        "github",
+        "pypi",
+        "manual",
+        "process",
+        "content"
+      ]
+    },
+    "Span": {
+      "if": {
+        "properties": {
+          "open": {
+            "const": true
+          }
+        },
+        "required": [
+          "open"
+        ]
+      },
+      "then": true,
+      "else": {
+        "required": [
+          "end"
+        ]
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)+$"
+        },
+        "service": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "start": {
+          "$ref": "#/$defs/DateOrTodo"
+        },
+        "end": {
+          "$ref": "#/$defs/DateOrTodo"
+        },
+        "open": {
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "#/$defs/SpanStatus"
+        },
+        "tags": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TagValue"
+          },
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_.]*$"
+          },
+          "type": "object"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/Event"
+          },
+          "type": "array"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/$defs/Link"
+          },
+          "type": "array"
+        },
+        "todo": {
+          "items": {
+            "type": "string",
+            "pattern": "^TODO\\(divy\\)"
+          },
+          "type": "array"
+        },
+        "children": {
+          "items": {
+            "$ref": "#/$defs/Span"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "service",
+        "start"
+      ]
+    },
+    "SpanStatus": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "error"
+      ]
+    },
+    "SpansFile": {
+      "properties": {
+        "version": {
+          "type": "integer",
+          "maximum": 1,
+          "minimum": 1
+        },
+        "services": {
+          "items": {
+            "$ref": "#/$defs/Service"
+          },
+          "type": "array",
+          "minItems": 1
+        },
+        "trace": {
+          "$ref": "#/$defs/Span"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "version",
+        "services",
+        "trace"
+      ]
+    },
+    "TOCEntry": {
+      "properties": {
+        "level": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "level",
+        "id",
+        "text"
+      ]
+    },
+    "TagValue": {
+      "anyOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "Target": {
+      "properties": {
+        "refId": {
+          "type": "string",
+          "pattern": "^[A-Z]$"
+        },
+        "expr": {
+          "type": "string",
+          "minLength": 1
+        },
+        "legendFormat": {
+          "type": "string"
+        },
+        "instant": {
+          "type": "boolean"
+        },
+        "hide": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "refId",
+        "expr"
+      ]
+    },
+    "ThresholdMode": {
+      "type": "string",
+      "enum": [
+        "absolute",
+        "percentage"
+      ]
+    },
+    "ThresholdStep": {
+      "properties": {
+        "value": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "$ref": "#/$defs/PaletteColor"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "value",
+        "color"
+      ]
+    },
+    "Thresholds": {
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/ThresholdMode"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/ThresholdStep"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "mode",
+        "steps"
+      ]
+    },
+    "TimeOption": {
+      "type": "string",
+      "enum": [
+        "24h",
+        "7d",
+        "30d",
+        "1y",
+        "all"
+      ]
+    },
+    "TodoItem": {
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        },
+        "col": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "context": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "file",
+        "line",
+        "col",
+        "path",
+        "context",
+        "text"
+      ]
+    },
+    "UptimeFile": {
+      "properties": {
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/UptimeTarget"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "targets"
+      ]
+    },
+    "UptimeHeartbeats": {
+      "properties": {
+        "generated_at": {
+          "type": "string"
+        },
+        "days": {
+          "type": "integer"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/HeartbeatTarget"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "generated_at",
+        "days",
+        "bucket",
+        "targets"
+      ]
+    },
+    "UptimeIncident": {
+      "properties": {
+        "started_at": {
+          "type": "string"
+        },
+        "ended_at": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "duration_s": {
+          "type": "integer"
+        },
+        "probes": {
+          "type": "integer"
+        },
+        "first_error": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "started_at",
+        "ended_at",
+        "duration_s",
+        "probes",
+        "first_error"
+      ]
+    },
+    "UptimeStatus": {
+      "type": "string",
+      "enum": [
+        "up",
+        "down",
+        "unconfigured",
+        "unknown"
+      ]
+    },
+    "UptimeTarget": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "format": "uri"
+            },
+            {
+              "pattern": "^TODO\\(divy\\)"
+            }
+          ],
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/ProbeMethod"
+        },
+        "expected_status": {
+          "$ref": "#/$defs/IntOrList"
+        },
+        "timeout": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$"
+        },
+        "interval": {
+          "type": "string",
+          "pattern": "^(([0-9]+)(ms|s|m|h|d|w|y))+$"
+        },
+        "follow_redirects": {
+          "type": "boolean"
+        },
+        "span": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "url"
+      ]
+    },
+    "UptimeTargetView": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/ProbeMethod"
+        },
+        "expected_status": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "timeout": {
+          "type": "string"
+        },
+        "interval": {
+          "type": "string"
+        },
+        "follow_redirects": {
+          "type": "boolean"
+        },
+        "span": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "note": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "configured": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "url",
+        "method",
+        "expected_status",
+        "timeout",
+        "interval",
+        "follow_redirects",
+        "span",
+        "note",
+        "configured"
+      ]
+    },
+    "UptimeWindows": {
+      "properties": {
+        "24h": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "7d": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "30d": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "90d": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "24h",
+        "7d",
+        "30d",
+        "90d"
+      ]
+    }
+  }
+}

@@ -59,7 +59,7 @@ func (l *loader) sanitizeFile(file, text string) {
 				continue
 			}
 			for _, m := range p.re.FindAllString(ln, -1) {
-				if p.allowTodo && strings.Contains(m, TodoMarker) {
+				if p.allowTodo && (strings.Contains(m, TodoMarker) || reservedDomain(m)) {
 					continue
 				}
 				if p.minDigits > 0 {
@@ -85,4 +85,19 @@ func countDigits(s string) int {
 		}
 	}
 	return n
+}
+
+// reservedDomain reports whether an address uses an RFC 2606 documentation domain.
+func reservedDomain(addr string) bool {
+	at := strings.LastIndex(addr, "@")
+	if at < 0 {
+		return false
+	}
+	host := strings.ToLower(strings.TrimRight(addr[at+1:], "."))
+	for _, d := range []string{"example.com", "example.net", "example.org", "example"} {
+		if host == d || strings.HasSuffix(host, "."+d) {
+			return true
+		}
+	}
+	return false
 }

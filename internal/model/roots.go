@@ -28,6 +28,14 @@ type APIRoots struct {
 	CollectSummary           CollectSummary           `json:"CollectSummary"`
 	PlainError               PlainError               `json:"PlainError"`
 	PromError                PromError                `json:"PromError"`
+	PromQueryResult          PromQueryResult          `json:"PromQueryResult"`
+	PromSeriesResult         PromSeriesResult         `json:"PromSeriesResult"`
+	PromLabelsResult         PromLabelsResult         `json:"PromLabelsResult"`
+	PromMetadataResult       PromMetadataResult       `json:"PromMetadataResult"`
+	PromBuildInfoResult      PromBuildInfoResult      `json:"PromBuildInfoResult"`
+	PromRulesResult          PromRulesResult          `json:"PromRulesResult"`
+	PromAlertsResult         PromAlertsResult         `json:"PromAlertsResult"`
+	PromExemplarsResult      PromExemplarsResult      `json:"PromExemplarsResult"`
 }
 
 // SchemaRoots lists every schema file divy schemagen writes, in output order.

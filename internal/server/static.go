@@ -76,7 +76,7 @@ func (h *staticHandler) serveFile(w http.ResponseWriter, r *http.Request, p stri
 		writeError(w, http.StatusNotFound, "not found")
 		return
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	b, err := io.ReadAll(f)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "internal error: "+RequestID(r.Context()))

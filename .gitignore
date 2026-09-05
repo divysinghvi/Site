@@ -1,0 +1,30 @@
+# environment
+.env
+.env.*
+!.env.example
+
+# build output
+bin/
+web/build/
+web/.svelte-kit/
+internal/web/dist/*
+!internal/web/dist/.gitkeep
+
+# dependencies
+node_modules/
+
+# databases
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+data/
+
+# platform
+.vercel/
+.playwright/
+.lighthouseci/
+
+# editor / OS
+.DS_Store
+*.swp

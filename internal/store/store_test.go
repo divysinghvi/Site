@@ -74,7 +74,7 @@ func TestMigrateIdempotent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s2.Close()
+	defer func() { _ = s2.Close() }()
 	for _, table := range []string{"series", "samples", "probe_results", "otel_spans", "collector_runs", "collector_state", "schema_migrations"} {
 		var n int
 		if err := s2.Reader().QueryRowContext(ctx, "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?", table).Scan(&n); err != nil || n != 1 {

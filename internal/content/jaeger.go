@@ -62,7 +62,7 @@ func (c *Content) jaegerSpan(n *Node, now time.Time) model.JaegerSpan {
 		tags = append(tags, kv("divy.title", sp.Title))
 	}
 	tags = append(tags, kv("divy.start", string(sp.Start)), kv("divy.start_precision", string(n.StartPrecision)))
-	if !(sp.Open && sp.End == "") {
+	if !sp.Open || sp.End != "" {
 		tags = append(tags, kv("divy.end", string(sp.End)))
 	}
 	tags = append(tags, kv("divy.end_precision", string(n.EndPrecision)))

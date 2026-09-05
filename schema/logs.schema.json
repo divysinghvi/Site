@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divy.dev/schema/logs.schema.json",
+  "$ref": "#/$defs/LogLine",
+  "$defs": {
+    "LogLevel": {
+      "type": "string",
+      "enum": [
+        "debug",
+        "info",
+        "warn",
+        "error"
+      ]
+    },
+    "LogLine": {
+      "properties": {
+        "ts": {
+          "anyOf": [
+            {
+              "pattern": "Z$",
+              "format": "date-time"
+            },
+            {
+              "pattern": "^TODO\\(divy\\)(: .+)?$"
+            }
+          ],
+          "type": "string"
+        },
+        "precision": {
+          "$ref": "#/$defs/LogPrecision"
+        },
+        "level": {
+          "$ref": "#/$defs/LogLevel"
+        },
+        "service": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "span": {
+          "type": "string"
+        },
+        "component": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        }
+      },
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean"
+        ]
+      },
+      "propertyNames": {
+        "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+      },
+      "type": "object",
+      "required": [
+        "ts",
+        "level",
+        "service",
+        "msg"
+      ]
+    },
+    "LogPrecision": {
+      "type": "string",
+      "enum": [
+        "day",
+        "month",
+        "year"
+      ]
+    }
+  }
+}

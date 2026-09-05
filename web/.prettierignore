@@ -1,0 +1,10 @@
+# generated
+src/lib/api/types.gen.ts
+.svelte-kit/
+node_modules/
+build/
+../internal/web/dist/
+package-lock.json
+test-results/
+playwright-report/
+.playwright/
