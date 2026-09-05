@@ -28,7 +28,7 @@ type Node struct {
 	Span     *model.Span
 	Parent   *Node
 	Depth    int
-	Children []*Node // sorted by (resolved start, id)
+	Children []*Node // in file order
 	Path     string  // JSONPath in spans.yaml
 
 	// Start is the resolved start; StartPrecision is year|month|day|todo.
@@ -75,7 +75,7 @@ func (n *Node) Title() string {
 	return n.Span.ID
 }
 
-// Nodes returns every span in DFS order (children sorted by start, id).
+// Nodes returns every span in DFS order (children in file order).
 func (c *Content) Nodes() []*Node { return c.nodes }
 
 // Node returns the node of a span id.
@@ -150,13 +150,7 @@ func (c *Content) resolve(n *Node, now time.Time) {
 		c.resolve(ch, now)
 		n.Children = append(n.Children, ch)
 	}
-	sort.SliceStable(n.Children, func(i, j int) bool {
-		a, b := n.Children[i], n.Children[j]
-		if !a.Start.Equal(b.Start) {
-			return a.Start.Before(b.Start)
-		}
-		return a.Span.ID < b.Span.ID
-	})
+	// Children keep the file order: the author decides what reads first.
 }
 
 // parentEnd is the fallback end for a TODO end: the parent's resolved end (open parent → now).

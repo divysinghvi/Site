@@ -60,6 +60,8 @@ export interface TraceNode {
 	children: TraceNode[];
 	/** Position in DFS order. */
 	index: number;
+	/** position in the API span array; drives sibling order */
+	order: number;
 }
 
 export interface TraceService {
@@ -124,6 +126,7 @@ function precision(v: string | undefined, fallback: DatePrecision): DatePrecisio
  */
 export function snapshotNow(trace: JaegerTrace): number | undefined {
 	let now: number | undefined;
+	let seq = 0;
 	for (const s of trace.spans) {
 		if (!tagBool(s.tags, 'divy.open') || tagString(s.tags, 'divy.end_planned')) continue;
 		const end = s.startTime + s.duration;
@@ -146,7 +149,8 @@ function eventsOf(span: JaegerSpan): TraceEvent[] {
 }
 
 function compare(a: TraceNode, b: TraceNode): number {
-	return a.startUs - b.startUs || a.name.localeCompare(b.name);
+	// Keep the API order (content file order for the career trace, start order for self-traces).
+	return a.order - b.order;
 }
 
 export function buildTrace(trace: JaegerTrace, nowUs?: number): TraceModel {
@@ -155,6 +159,7 @@ export function buildTrace(trace: JaegerTrace, nowUs?: number): TraceModel {
 	const serviceMap = new Map<string, TraceService>();
 	let isContent = false;
 
+	let seq = 0;
 	for (const s of trace.spans) {
 		const proc = trace.processes[s.processID];
 		const service = proc?.serviceName ?? s.processID;
@@ -229,7 +234,8 @@ export function buildTrace(trace: JaegerTrace, nowUs?: number): TraceModel {
 			depth: tagNumber(s.tags, 'divy.depth') ?? 0,
 			parentId: parentSpanId(s),
 			children: [],
-			index: 0
+			index: 0,
+			order: seq++
 		};
 		byId.set(node.id, node);
 		byKey.set(node.key, node);

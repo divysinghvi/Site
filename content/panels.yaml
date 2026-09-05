@@ -74,7 +74,7 @@ panels:
     unit: short
     decimals: 0
     stack: true
-    description: Cumulative merged PRs per repository owner (kubernetes, kubeflow, gradr — private, count only — and others).
+    description: Cumulative merged PRs per repository owner (kubernetes, gradr — private, count only — and others).
     source: {kind: github, cadence: 15m, note: "GitHub search is:pr is:merged author:divysinghvi; org = repo owner login"}
 
   # ---- row 2 (y=12) ----

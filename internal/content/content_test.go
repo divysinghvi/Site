@@ -121,12 +121,12 @@ func TestTreeResolution(t *testing.T) {
 	if !edu.Open() || edu.EndPrecision != PrecisionYear || !edu.AxisEnd(frozen).Equal(time.Date(2028, 1, 1, 0, 0, 0, 0, time.UTC)) {
 		t.Errorf("edu = %+v", edu)
 	}
-	// DFS order: children sorted by (start, id); TODO children share the parent's start
+	// DFS order: children keep the file order
 	ids := make([]string, 0, len(c.Nodes()))
 	for _, n := range c.Nodes() {
 		ids = append(ids, n.Span.ID)
 	}
-	if ids[0] != "divy.career" || ids[1] != "edu.btech-ece" || ids[2] != "freelance.web-dev" || ids[len(ids)-1] != "gradr.product-features" {
+	if ids[0] != "divy.career" || ids[1] != "edu.btech-ece" || ids[2] != "freelance.web-dev" || ids[len(ids)-1] != "quant.worldquant-iqc" {
 		t.Errorf("order = %v", ids)
 	}
 	if pm := c.PostmortemsFor("gradr.observability"); len(pm) != 4 || pm[0] != "INC-001" {

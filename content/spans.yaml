@@ -1,6 +1,6 @@
 # content/spans.yaml — the career trace (brief §3.1).
 # Quote every date ("2024-05", not 2024-05). Month precision is YYYY-MM; unknown = TODO(divy).
-# Children order carries no meaning: the API sorts by resolved start. Run `make validate` after editing.
+# Children render in file order (the API and the viewer keep it): put the most important spans first.
 version: 1
 
 services:
@@ -28,7 +28,6 @@ trace:
     interests: [x86-64 asm, webassembly, llvm, competitive programming, quant finance]
     open_to: [backend intern, infra, sre]
   children:
-
     # ---------------------------------------------------------------- education
     - id: edu.btech-ece
       service: edu
@@ -207,191 +206,6 @@ trace:
           tags: {stack: TODO(divy)}
           todo: ["TODO(divy): product stack; 2–3 shipped features (sanitized) as events"]
 
-    # ---------------------------------------------------------------- open source
-    - id: oss.minikube
-      service: oss
-      title: kubernetes/minikube — 15+ merged PRs (CNCF)
-      start: TODO(divy)
-      end: TODO(divy)
-      tags: {role: contributor, org: kubernetes, repo: kubernetes/minikube, lang: TODO(divy)}
-      events:
-        - {ts: TODO(divy), name: first PR merged, attrs: {repo: kubernetes/minikube}}
-      links:
-        - {kind: repo, url: https://github.com/kubernetes/minikube, label: kubernetes/minikube}
-        - {kind: url, url: "https://github.com/kubernetes/minikube/pulls?q=is%3Apr+is%3Amerged+author%3Adivysinghvi", label: merged PRs by divysinghvi}
-      todo:
-        - "TODO(divy): first/last merge months"
-        - "TODO(divy): fill one child per merged PR (15 stubs below; add more to match the real count)"
-      children:
-        - id: oss.minikube.pr-01
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date (start = end = merge day)"]
-        - id: oss.minikube.pr-02
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-03
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-04
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-05
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-06
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-07
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-08
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-09
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-10
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-11
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-12
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-13
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-14
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-        - id: oss.minikube.pr-15
-          service: oss
-          title: "TODO(divy): PR title"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {repo: kubernetes/minikube, lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): PR number, title, URL, merge date"]
-
-    - id: oss.kubeflow
-      service: oss
-      title: kubeflow — contributions (CNCF)
-      start: TODO(divy)
-      end: TODO(divy)
-      tags: {role: contributor, org: kubeflow, lang: TODO(divy)}
-      links:
-        - {kind: url, url: https://github.com/kubeflow, label: kubeflow on GitHub}
-      todo: ["TODO(divy): repos, PR/issue links, months; one child per contribution (2 stubs below; add or remove to match)"]
-      children:
-        - id: oss.kubeflow.contrib-01
-          service: oss
-          title: "TODO(divy): contribution title (PR / issue / review)"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {org: kubeflow, repo: TODO(divy), lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): repo, kind, URL, date"]
-        - id: oss.kubeflow.contrib-02
-          service: oss
-          title: "TODO(divy): contribution title (PR / issue / review)"
-          start: TODO(divy)
-          end: TODO(divy)
-          tags: {org: kubeflow, repo: TODO(divy), lang: TODO(divy)}
-          links: [{kind: pr, url: TODO(divy)}]
-          todo: ["TODO(divy): repo, kind, URL, date"]
-
-    - id: oss.lfx-velero-application
-      service: oss
-      title: LFX Mentorship 2026 Term 3 — Velero (CSI Snapshot E2E tests in Kind CI)
-      start: TODO(divy)
-      open: true
-      tags: {role: applicant, project: velero, status: pending, also_targeting: opentelemetry}
-      links:
-        - {kind: url, url: TODO(divy), label: LFX project listing}
-      todo:
-        - "TODO(divy): application month; on a decision set end + open: false + tags.status and update manual_metrics.yaml"
-        - "TODO(divy): was a separate OpenTelemetry application submitted? (then a sibling span + lfx_applications = 2)"
-
-    - id: oss.wasmedge-prep
-      service: oss
-      title: WasmEdge Wide Arithmetic proposal — prep (128-bit arithmetic library, C++/x86-64)
-      start: TODO(divy)
-      end: TODO(divy)
-      tags: {role: explorer, lang: [cpp, x86-64-asm], stack: [wasmedge, webassembly]}
-      links: [{kind: repo, url: TODO(divy), label: 128-bit arithmetic library}]
-      todo: ["TODO(divy): months; library repo URL; was a WasmEdge PR/issue opened?"]
-
     # ---------------------------------------------------------------- projects
     - id: project.codemind
       service: project
@@ -431,3 +245,81 @@ trace:
       events:
         - {ts: TODO(divy), name: 2nd Prize — Stage 1, attrs: {global_rank: 98}}
       todo: ["TODO(divy): competition months; prize announcement date; certificate/announcement URL"]
+
+    # ---------------------------------------------------------------- open source
+    - id: oss.minikube
+      service: oss
+      title: kubernetes/minikube — 6 merged PRs (CNCF)
+      start: "2025-07-15"
+      end: "2025-11-30"
+      tags: {role: contributor, org: kubernetes, repo: kubernetes/minikube, lang: go, merged_prs: 6, source: git history}
+      events:
+        - {ts: "2025-07-15", name: first PR merged, attrs: {pr: 21024}}
+        - {ts: "2025-11-30", name: sixth PR merged, attrs: {pr: 21974}}
+      links:
+        - {kind: repo, url: https://github.com/kubernetes/minikube, label: kubernetes/minikube}
+        - {kind: url, url: "https://github.com/kubernetes/minikube/pulls?q=is%3Apr+is%3Amerged+author%3Adivysinghvi", label: merged PRs by divysinghvi}
+      children:
+        - id: oss.minikube.pr-21024
+          service: oss
+          title: "Deprecate HyperKit driver with warning (#21024)"
+          start: "2025-07-15"
+          end: "2025-07-15"
+          tags: {repo: kubernetes/minikube, pr: 21024, lang: go}
+          links: [{kind: pr, url: https://github.com/kubernetes/minikube/pull/21024, label: "#21024"}]
+        - id: oss.minikube.pr-21083
+          service: oss
+          title: "Manually bump runc to v1.3.0 and migrate to github.com/opencontainers (#21083)"
+          start: "2025-07-20"
+          end: "2025-07-20"
+          tags: {repo: kubernetes/minikube, pr: 21083, lang: go}
+          links: [{kind: pr, url: https://github.com/kubernetes/minikube/pull/21083, label: "#21083"}]
+        - id: oss.minikube.pr-21139
+          service: oss
+          title: "Skip Kubernetes preloads and binary downloads when --no-kubernetes is set (fixes #21107) (#21139)"
+          start: "2025-07-25"
+          end: "2025-11-11"
+          tags: {repo: kubernetes/minikube, pr: 21139, lang: go, commits: 20}
+          links: [{kind: pr, url: https://github.com/kubernetes/minikube/pull/21139, label: "#21139"}]
+        - id: oss.minikube.pr-21209
+          service: oss
+          title: "Updated site/readme.md outdated documentation (#21209)"
+          start: "2025-07-31"
+          end: "2025-07-31"
+          tags: {repo: kubernetes/minikube, pr: 21209, lang: markdown}
+          links: [{kind: pr, url: https://github.com/kubernetes/minikube/pull/21209, label: "#21209"}]
+        - id: oss.minikube.pr-21759
+          service: oss
+          title: "RPM package: Add vendor info (#21759)"
+          start: "2025-10-17"
+          end: "2025-11-05"
+          tags: {repo: kubernetes/minikube, pr: 21759, lang: [go, rpm-spec], commits: 4}
+          links: [{kind: pr, url: https://github.com/kubernetes/minikube/pull/21759, label: "#21759"}]
+        - id: oss.minikube.pr-21974
+          service: oss
+          title: "ci: Added docker-containerd-linux-x86-64 tests to prow (#21974)"
+          start: "2025-11-24"
+          end: "2025-11-30"
+          tags: {repo: kubernetes/minikube, pr: 21974, lang: [go, shell], commits: 5}
+          links: [{kind: pr, url: https://github.com/kubernetes/minikube/pull/21974, label: "#21974"}]
+
+    - id: oss.lfx-velero-application
+      service: oss
+      title: LFX Mentorship 2026 Term 3 — Velero (CSI Snapshot E2E tests in Kind CI)
+      start: TODO(divy)
+      open: true
+      tags: {role: applicant, project: velero, status: pending, also_targeting: opentelemetry}
+      links:
+        - {kind: url, url: TODO(divy), label: LFX project listing}
+      todo:
+        - "TODO(divy): application month; on a decision set end + open: false + tags.status and update manual_metrics.yaml"
+        - "TODO(divy): was a separate OpenTelemetry application submitted? (then a sibling span + lfx_applications = 2)"
+
+    - id: oss.wasmedge-prep
+      service: oss
+      title: WasmEdge Wide Arithmetic proposal — prep (128-bit arithmetic library, C++/x86-64)
+      start: TODO(divy)
+      end: TODO(divy)
+      tags: {role: explorer, lang: [cpp, x86-64-asm], stack: [wasmedge, webassembly]}
+      links: [{kind: repo, url: TODO(divy), label: 128-bit arithmetic library}]
+      todo: ["TODO(divy): months; library repo URL; was a WasmEdge PR/issue opened?"]
