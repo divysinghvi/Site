@@ -128,6 +128,18 @@ func New(cfg Config) (*Provider, error) {
 	return p, nil
 }
 
+// SetMetrics routes the sampler and exporter counters to m (the server's
+// registry, built after the provider because the provider must exist before
+// the router). Call it before the first request.
+func (p *Provider) SetMetrics(m Metrics) {
+	if m == nil {
+		return
+	}
+	p.sampler.metrics = m
+	p.proc.metrics = m
+	p.proc.exp.metrics = m
+}
+
 // Tracer returns the tracer of this package's scope.
 func (p *Provider) Tracer() oteltrace.Tracer { return p.tracer }
 

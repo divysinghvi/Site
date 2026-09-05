@@ -49,7 +49,7 @@
 	--hatch: rgba(0, 0, 0, 0.08);
 }
 
-/* Konami hook: a 2017-era dark-blue theme. Tokens only; the later theming step styles it. */
+/* Konami code: a 2017-era dark-blue theme (tokens + the square, flat chrome of that era; no logos). */
 [data-theme='grafana2017'] {
 	color-scheme: dark;
 	--bg: #0f1926;
@@ -70,6 +70,30 @@
 	--focus: #33b5e5;
 	--selection: rgba(51, 181, 229, 0.18);
 	--hatch: rgba(255, 255, 255, 0.08);
+	--radius: 0px;
+}
+[data-theme='grafana2017'] .panel,
+[data-theme='grafana2017'] .btn,
+[data-theme='grafana2017'] .input,
+[data-theme='grafana2017'] kbd {
+	border-radius: 0;
+}
+[data-theme='grafana2017'] .panel {
+	background: linear-gradient(180deg, var(--panel-2) 0, var(--panel) 2.5rem);
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+[data-theme='grafana2017'] .panel-header {
+	background: var(--panel-2);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	font-size: 0.72rem;
+}
+[data-theme='grafana2017'] .btn-primary {
+	background: linear-gradient(180deg, #4fa0d0, #2c7cb0);
+	border-color: #2c7cb0;
+}
+[data-theme='grafana2017'] body {
+	background: radial-gradient(ellipse at top, #16243a 0, var(--bg) 60%);
 }
 
 @theme inline {
@@ -94,6 +118,9 @@
 }
 
 /* ---- base ---- */
+:root {
+	--radius: 6px;
+}
 html {
 	background: var(--bg);
 	color: var(--fg);
@@ -135,6 +162,20 @@ kbd {
 	font-size: 0.75rem;
 	line-height: 1.5;
 	text-align: center;
+}
+
+/* Touch: every control is at least 44 px tall (brief §7: mobile first). */
+@media (pointer: coarse) {
+	.btn,
+	.input,
+	select.input,
+	button.chip,
+	.tab {
+		min-height: 2.75rem;
+	}
+	.btn {
+		min-width: 2.75rem;
+	}
 }
 
 /* Keyboard focus: a 2 px palette ring on every interactive element. */

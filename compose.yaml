@@ -1,0 +1,3 @@
+# `docker compose up` from the repository root. The service lives in deploy/.
+include:
+  - deploy/docker-compose.yml

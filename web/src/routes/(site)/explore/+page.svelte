@@ -1,9 +1,9 @@
 <script lang="ts">
-	// Explore (/explore?ds=prom&expr=…&from=…&to=…[&instant=1]): data-source
-	// tabs (Prometheus now; the Loki tab is reserved for the logs step), the
-	// PromQL query bar with autocomplete, a range picker, Run, results as a
-	// timeseries (range) or a table (instant), and the copyable curl. The
-	// page is a prerendered shell; params are read after hydration.
+	// Explore (/explore?ds=prom|loki&expr=…&from=…&to=…[&instant=1]): data-source
+	// tabs, the PromQL query bar with autocomplete (or the LogQL bar, level
+	// chips and log list of /logs on the Loki tab), a range picker, Run,
+	// results as a timeseries (range) or a table (instant), and the copyable
+	// curl. The page is a prerendered shell; params are read after hydration.
 	import { onMount, tick } from 'svelte';
 	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
@@ -40,6 +40,21 @@
 	import QueryBar from '$lib/panels/QueryBar.svelte';
 	import TimeRangePicker from '$lib/panels/TimeRangePicker.svelte';
 	import EmptyState from '$lib/panels/EmptyState.svelte';
+	import Seo from '$lib/components/ui/Seo.svelte';
+	import {
+		curlQueryRange,
+		formatStreamLabels,
+		isLogQuery,
+		loki,
+		lokiValue,
+		type RangeParams
+	} from '$lib/logql/loki';
+	import { DEFAULT_LIMIT, fieldNames, rowsFromStreams, type LogRow } from '$lib/logql/lines';
+	import { DEFAULT_SELECTOR } from '$lib/logql/selector';
+	import LogQueryBar from '$lib/logql/LogQueryBar.svelte';
+	import LevelChips from '$lib/logql/LevelChips.svelte';
+	import LogList from '$lib/logql/LogList.svelte';
+	import CurlBlock from '$lib/logql/CurlBlock.svelte';
 
 	let { data } = $props();
 
@@ -67,6 +82,88 @@
 	let bar = $state<QueryBar | null>(null);
 	let hydrated = false;
 	let controller: AbortController | null = null;
+
+	// ---- Loki tab (same bar / chips / list as /logs) ----
+	let logBar = $state<LogQueryBar | null>(null);
+	let lokiLabels = $state<string[]>([]);
+	let lokiServices = $state<string[]>([]);
+	let lokiLoaded = false;
+	let lokiResult = $state<{
+		query: string;
+		kind: 'streams' | 'matrix' | 'vector';
+		rows: LogRow[];
+		points: { key: string; series: string; ts: number; value: number }[];
+		range: ResolvedRange;
+		scanned: number;
+	} | null>(null);
+	let expandedLine = $state<string | null>(null);
+	let lokiFields = $derived(fieldNames(lokiResult?.rows ?? []));
+
+	function lokiParams(q: string, range: ResolvedRange): RangeParams {
+		return isLogQuery(q)
+			? { start: range.from, end: range.to, limit: DEFAULT_LIMIT, direction: 'backward' }
+			: { start: range.from, end: range.to, step: chooseStep(range.from, range.to) };
+	}
+
+	async function loadLokiMeta() {
+		if (lokiLoaded) return;
+		lokiLoaded = true;
+		const [labels, services] = await Promise.all([
+			loki.labels().catch(() => [] as string[]),
+			loki.labelValues('service').catch(() => [] as string[])
+		]);
+		lokiLabels = labels;
+		lokiServices = services;
+	}
+
+	async function runLoki(ctl: AbortController) {
+		const q = expr.trim() || DEFAULT_SELECTOR;
+		const range = currentRange();
+		const res = await loki.queryRange(q, { ...lokiParams(q, range), signal: ctl.signal });
+		if (ctl.signal.aborted) return;
+		const d = res.data;
+		const points: { key: string; series: string; ts: number; value: number }[] = [];
+		if (d.resultType === 'matrix')
+			for (const s of d.result)
+				for (const [t, v] of s.values)
+					points.push({ key: formatStreamLabels(s.metric) + t, series: formatStreamLabels(s.metric), ts: t, value: lokiValue(v) });
+		if (d.resultType === 'vector')
+			for (const s of d.result)
+				points.push({ key: formatStreamLabels(s.metric), series: formatStreamLabels(s.metric), ts: s.value[0], value: lokiValue(s.value[1]) });
+		lokiResult = {
+			query: q,
+			kind: d.resultType,
+			rows: d.resultType === 'streams' ? rowsFromStreams(d.result) : [],
+			points,
+			range,
+			scanned: res.stats?.summary.totalLinesProcessed ?? 0
+		};
+		expandedLine = null;
+	}
+
+	function onLevels(next: string) {
+		expr = next;
+		void run();
+	}
+
+	async function fetchLokiValues(label: string) {
+		if (label === 'service' && lokiServices.length) return lokiServices;
+		return loki.labelValues(label);
+	}
+
+	let lokiCurl = $derived.by(() => {
+		if (ds !== 'loki') return '';
+		const q = expr.trim() || DEFAULT_SELECTOR;
+		const r = lokiResult?.query === q ? lokiResult.range : currentRange();
+		return curlQueryRange(origin, q, lokiParams(q, r));
+	});
+
+	let lokiExamples = [
+		'{service="gradr"} |= "sentry" | json | level="warn"',
+		'{service=~"euro-tech|ef-polymer"} |~ "(?i)shipped|deployed"',
+		'{level="debug"}',
+		'sum by (service) (count_over_time({service=~".+"}[10y]))'
+	];
 
 	let origin = $derived(
 		data.siteOrigin || (typeof location !== 'undefined' ? location.origin : '')
@@ -131,10 +228,9 @@
 	}
 
 	async function run() {
-		if (ds !== 'prom') return;
 		const e = expr.trim();
 		writeParams();
-		if (!e) return;
+		if (!e && ds === 'prom') return;
 		controller?.abort();
 		const ctl = new AbortController();
 		controller = ctl;
@@ -142,6 +238,10 @@
 		error = null;
 		const range = currentRange();
 		try {
+			if (ds === 'loki') {
+				await runLoki(ctl);
+				return;
+			}
 			const res = instant
 				? await query(e, { signal: ctl.signal })
 				: await queryRange(e, { ...range, signal: ctl.signal });
@@ -167,6 +267,7 @@
 	onMount(() => {
 		readParams();
 		hydrated = true;
+		if (ds === 'loki') void loadLokiMeta();
 		void labelValues('__name__')
 			.then((m) => (metrics = m))
 			.catch(() => {});
@@ -174,10 +275,10 @@
 			.then((m) => (meta = m))
 			.catch(() => {});
 		void fetchReadyz().then((v) => (readyz = v));
-		if (expr.trim()) void run();
+		if (expr.trim() || ds === 'loki') void run();
 		const unbind = bindKeys('explore', {
 			'/': () => {
-				bar?.focus();
+				(ds === 'loki' ? logBar : bar)?.focus();
 				return true;
 			}
 		});
@@ -195,13 +296,22 @@
 		if (!hydrated || p === lastPreset) return;
 		lastPreset = p;
 		customFrom = customTo = undefined;
-		if (expr.trim()) void run();
+		if (expr.trim() || ds === 'loki') void run();
 		else writeParams();
 	});
 
 	function setDs(next: DS) {
+		if (ds === next) return;
 		ds = next;
-		writeParams();
+		error = null;
+		// a query written for the other data source is not carried over
+		expr = '';
+		result = null;
+		lokiResult = null;
+		if (next === 'loki') {
+			void loadLokiMeta();
+			void run();
+		} else writeParams();
 	}
 
 	function setInstant(v: boolean) {
@@ -298,13 +408,12 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Explore</title>
-	<meta
-		name="description"
-		content="Run PromQL against the site's Prometheus-compatible API: autocomplete, time range, graph or table, and the curl to reproduce it."
-	/>
-</svelte:head>
+<Seo
+	title="Explore · divy.dev"
+	description="Run PromQL or LogQL against the site's Prometheus- and Loki-compatible APIs: autocomplete, time range, graph, table or log lines, and the curl to reproduce it."
+	path="/explore"
+	origin={data.siteOrigin}
+/>
 
 <div class="explore">
 	<header class="head">
@@ -336,12 +445,89 @@
 	</header>
 
 	{#if ds === 'loki'}
-		<div id="ds-loki" role="tabpanel" aria-labelledby="tab-loki" class="panel reserved">
-			<p class="mono">Logs explorer lands in the next step.</p>
-			<p class="dim">
-				The API already answers <code>/loki/api/v1/labels</code>; the LogQL query bar, level chips
-				and live tail arrive with the logs page.
-			</p>
+		<div id="ds-loki" role="tabpanel" aria-labelledby="tab-loki" class="prom">
+			<form
+				class="querybar panel"
+				onsubmit={(e) => {
+					e.preventDefault();
+					void run();
+				}}
+			>
+				<label class="sr-only" for="logql">LogQL query</label>
+				<LogQueryBar
+					bind:this={logBar}
+					bind:value={expr}
+					labels={lokiLabels}
+					fields={lokiFields}
+					fetchValues={fetchLokiValues}
+					onrun={() => void run()}
+					id="logql"
+				/>
+				<div class="row">
+					<LevelChips query={expr} onchange={onLevels} />
+					<TimeRangePicker bind:value={preset} options={ALL_PRESETS} />
+					<button type="submit" class="btn btn-primary run" disabled={running}>
+						{running ? 'Running…' : 'Run query'}
+					</button>
+					<a class="btn logs-link" href="/logs?q={encodeURIComponent(expr.trim() || DEFAULT_SELECTOR)}"
+						>Open in Logs ↗</a
+					>
+				</div>
+			</form>
+
+			<CurlBlock curl={lokiCurl} />
+
+			<div class="results panel" aria-live="polite">
+				{#if error}
+					<EmptyState message={error} expr={expr.trim() || DEFAULT_SELECTOR} tone="error" />
+				{:else if !lokiResult}
+					<div class="starter">
+						<p class="dim">Type a LogQL query or start from one of these:</p>
+						<ul class="examples">
+							{#each lokiExamples as q (q)}
+								<li>
+									<button type="button" class="ex mono" onclick={() => void useExample(q)}>{q}</button>
+								</li>
+							{/each}
+						</ul>
+					</div>
+				{:else if lokiResult.kind === 'streams'}
+					<div class="res-head">
+						<span class="mono dim">
+							streams · {lokiResult.rows.length} lines of {lokiResult.scanned} scanned · newest first
+							· {lokiResult.range.from} → {lokiResult.range.to}
+						</span>
+					</div>
+					<LogList
+						rows={lokiResult.rows}
+						bind:expanded={expandedLine}
+						id="explore-logs"
+						emptyText="No lines matched {lokiResult.query} in this range."
+					/>
+				{:else if lokiResult.points.length === 0}
+					<EmptyState message="The metric query returned no series in this range." expr={lokiResult.query} />
+				{:else}
+					<div class="res-head">
+						<span class="mono dim">{lokiResult.kind} · {lokiResult.points.length} points</span>
+					</div>
+					<div class="table-wrap">
+						<table class="table mono">
+							<thead>
+								<tr><th scope="col">Series</th><th scope="col">Time</th><th scope="col" class="num">Value</th></tr>
+							</thead>
+							<tbody>
+								{#each lokiResult.points as r (r.key)}
+									<tr>
+										<td class="series">{r.series}</td>
+										<td class="dim">{new Date(r.ts * 1000).toISOString()}</td>
+										<td class="num">{Number.isInteger(r.value) ? r.value : r.value.toPrecision(6)}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				{/if}
+			</div>
 		</div>
 	{:else}
 		<div id="ds-prom" role="tabpanel" aria-labelledby="tab-prom" class="prom">
@@ -520,12 +706,8 @@
 		color: var(--fg);
 		border-bottom-color: var(--orange);
 	}
-	.reserved {
-		padding: 1.5rem;
-		text-align: center;
-	}
-	.reserved p {
-		margin: 0.25rem 0;
+	.logs-link {
+		text-decoration: none;
 	}
 	.dim {
 		color: var(--fg-dim);

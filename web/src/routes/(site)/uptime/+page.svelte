@@ -98,7 +98,14 @@
 		<link rel="canonical" href={canonical} />
 		<meta property="og:url" content={canonical} />
 	{/if}
-	<meta name="twitter:card" content="summary" />
+	{#if data.siteOrigin}
+		<meta property="og:image" content="{data.siteOrigin}/og/default.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+	{:else}
+		<meta name="twitter:card" content="summary" />
+	{/if}
 </svelte:head>
 
 <section class="page" aria-labelledby="up-title">

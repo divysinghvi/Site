@@ -36,6 +36,7 @@ import (
 	"divy.dev/internal/schemagen"
 	"divy.dev/internal/server"
 	"divy.dev/internal/store"
+	"divy.dev/internal/trace"
 	"divy.dev/internal/version"
 )
 
@@ -237,9 +238,24 @@ func cmdServe(args []string, stdout, stderr io.Writer) int {
 	if storage == "ephemeral" {
 		log.Warn("storage is ephemeral: a file database under /tmp on Vercel loses every sample with the instance; add the Turso integration (TURSO_DATABASE_URL) for durable history")
 	}
-	reg := registerCollectors(cfg, cnt, st, log)
+	tp, err := newTraceProvider(cfg, st, log)
+	if err != nil {
+		return fail(stderr, err)
+	}
+	if tp != nil {
+		// Runs after the HTTP server and scheduler stopped, before the store closes.
+		defer shutdownTraces(tp, log)
+	}
+	reg := registerCollectors(cfg, cnt, st, log, tp)
 	runner := &collector.Runner{Store: st, Registry: reg, Logger: log}
 
+	cacheEntries := 0
+	if cfg.ResponseCache {
+		cacheEntries = server.DefaultCacheEntries
+	}
+	if cfg.RateLimitRPS <= 0 {
+		log.Warn("RATE_LIMIT_RPS is off: no per-client token bucket")
+	}
 	var shuttingDown atomic.Bool
 	if len(cfg.CollectTokens) == 0 {
 		log.Warn("DIVY_COLLECT_TOKEN and CRON_SECRET are empty: /api/collect will answer 401 to every request")
@@ -268,6 +284,12 @@ func cmdServe(args []string, stdout, stderr io.Writer) int {
 		CollectorIntervals: map[string]time.Duration{
 			"github": cfg.IntervalGitHub, "pypi": cfg.IntervalPyPI, "uptime": cfg.IntervalUptime, "manual": cfg.IntervalManual, "retention": cfg.IntervalRetention,
 		},
+		Trace:             tp,
+		RateLimit:         server.RateLimitConfig{RPS: cfg.RateLimitRPS, Burst: cfg.RateLimitBurst, GlobalRPS: cfg.RateLimitGlobalRPS, GlobalBurst: cfg.RateLimitGlobalBurst},
+		CORSOrigins:       cfg.CORSOrigins,
+		TrustedProxies:    cfg.TrustedProxies,
+		TrustProxyHeaders: cfg.TrustProxyHeaders,
+		CacheEntries:      cacheEntries,
 	})
 	if err != nil {
 		return fail(stderr, err)
@@ -282,7 +304,7 @@ func cmdServe(args []string, stdout, stderr io.Writer) int {
 	if err != nil {
 		return fail(stderr, err)
 	}
-	log.Info("divy serve", "addr", ln.Addr().String(), "db", st.Mode, "storage", storage, "collectors", strings.Join(reg.Names(), ","), "content", cfg.ContentDir, "spans", len(cnt.Nodes()), "logs", len(cnt.Logs), "todos", len(cnt.Todos), "collect", collect, "startup_ms", time.Since(start).Milliseconds(), "version", version.Version)
+	log.Info("divy serve", "addr", ln.Addr().String(), "db", st.Mode, "storage", storage, "collectors", strings.Join(reg.Names(), ","), "content", cfg.ContentDir, "spans", len(cnt.Nodes()), "logs", len(cnt.Logs), "todos", len(cnt.Todos), "collect", collect, "tracing", tp != nil, "ratelimit_rps", cfg.RateLimitRPS, "cache_entries", cacheEntries, "cors", len(cfg.CORSOrigins), "startup_ms", time.Since(start).Milliseconds(), "version", version.Version)
 	errCh := make(chan error, 1)
 	go func() { errCh <- hs.Serve(ln) }()
 	select {
@@ -318,21 +340,58 @@ func storageKind(st *store.Store) model.StorageKind {
 	return "file"
 }
 
+// newTraceProvider installs the OpenTelemetry self-tracing (OTEL_TRACING,
+// default on): spans land in the store's otel_spans table so that every
+// X-Divy-Trace-Id resolves at /api/traces/{id}. nil = tracing off.
+func newTraceProvider(cfg *config.Config, st *store.Store, log *slog.Logger) (*trace.Provider, error) {
+	if !cfg.OTelTracing {
+		log.Warn("OTEL_TRACING is off: no self-tracing, responses carry no X-Divy-Trace-Id")
+		return nil, nil
+	}
+	tp, err := trace.New(trace.Config{ServiceName: cfg.OTelServiceName, Version: version.Version, SampleRPS: cfg.OTelSampleRPS, SampleBurst: cfg.OTelSampleBurst, Store: st, Logger: log})
+	if err != nil {
+		return nil, fmt.Errorf("otel: %w", err)
+	}
+	return tp, nil
+}
+
+// shutdownTraces flushes the buffered child spans and stops the provider.
+func shutdownTraces(tp *trace.Provider, log *slog.Logger) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := tp.Shutdown(ctx); err != nil {
+		log.Warn("otel shutdown", "err", err.Error())
+	}
+}
+
 // registerCollectors builds the real collectors from the config and the
 // loaded content, in the fixed order github, pypi, uptime, manual, retention.
 // COLLECT_DISABLED entries are registered as disabled (reported as skipped),
 // as is GitHub without DIVY_GITHUB_TOKEN — with one warning, nothing faked.
-func registerCollectors(cfg *config.Config, cnt *content.Content, st *store.Store, log *slog.Logger) *collector.Registry {
+// With a trace provider every run is one root span ("collector.<name>") and
+// every outbound request a client span under it.
+func registerCollectors(cfg *config.Config, cnt *content.Content, st *store.Store, log *slog.Logger, tp *trace.Provider) *collector.Registry {
 	reg := collector.NewRegistry()
 	ua := collector.UserAgent(cfg.SiteOrigin)
 	if cfg.GitHubToken == "" {
 		log.Warn("DIVY_GITHUB_TOKEN is empty: the GitHub collector is disabled; github_* and oss_prs_open series stay absent (nothing is faked)")
 	}
 	packages := pypi.MergePackages(pypi.PackagesFromContent(cnt), cfg.PyPIPackages)
+	httpClient := func() *http.Client {
+		c := collector.NewHTTPClient(30 * time.Second)
+		if tp != nil {
+			c = tp.HTTPClient(c)
+		}
+		return c
+	}
+	var probeTransport http.RoundTripper
+	if tp != nil {
+		probeTransport = tp.Transport(&http.Transport{Proxy: http.ProxyFromEnvironment, DisableKeepAlives: true, TLSHandshakeTimeout: cfg.ProbeTimeout, ForceAttemptHTTP2: true})
+	}
 	all := []collector.Collector{
-		github.New(github.Config{Token: cfg.GitHubToken, Login: cfg.GitHubLogin, PrivateOrgs: cfg.GitHubPrivateOrgs, Interval: cfg.IntervalGitHub, UserAgent: ua, Logger: log}, st),
-		pypi.New(pypi.Config{Packages: packages, Interval: cfg.IntervalPyPI, UserAgent: ua, Logger: log}, st),
-		uptime.New(uptime.Config{Targets: uptime.TargetsFromContent(cnt, cfg.ProbeTimeout), Interval: cfg.IntervalUptime, UserAgent: uptime.UserAgent(cfg.SiteOrigin), Logger: log}, st),
+		github.New(github.Config{Token: cfg.GitHubToken, Login: cfg.GitHubLogin, PrivateOrgs: cfg.GitHubPrivateOrgs, Interval: cfg.IntervalGitHub, UserAgent: ua, Logger: log, HTTPClient: httpClient()}, st),
+		pypi.New(pypi.Config{Packages: packages, Interval: cfg.IntervalPyPI, UserAgent: ua, Logger: log, HTTPClient: httpClient()}, st),
+		uptime.New(uptime.Config{Targets: uptime.TargetsFromContent(cnt, cfg.ProbeTimeout), Interval: cfg.IntervalUptime, UserAgent: uptime.UserAgent(cfg.SiteOrigin), Logger: log, Transport: probeTransport}, st),
 		manual.New(manual.Config{Interval: cfg.IntervalManual, Logger: log}, cnt, st),
 		retention.New(retention.Config{Interval: cfg.IntervalRetention, Logger: log}, st),
 	}
@@ -344,6 +403,9 @@ func registerCollectors(cfg *config.Config, cnt *content.Content, st *store.Stor
 		if disabled[c.Name()] {
 			log.Warn("collector disabled by COLLECT_DISABLED", "collector", c.Name())
 			c = collector.WrapDisabled(c, "disabled by COLLECT_DISABLED")
+		}
+		if tp != nil {
+			c = tp.WrapCollector(c)
 		}
 		if err := reg.Register(c); err != nil {
 			log.Error("register collector", "collector", c.Name(), "err", err.Error())
@@ -398,7 +460,14 @@ func cmdCollect(args []string, stdout, stderr io.Writer) int {
 		return fail(stderr, err)
 	}
 	defer func() { _ = st.Close() }()
-	reg := registerCollectors(cfg, cnt, st, log)
+	tp, err := newTraceProvider(cfg, st, log)
+	if err != nil {
+		return fail(stderr, err)
+	}
+	if tp != nil {
+		defer shutdownTraces(tp, log)
+	}
+	reg := registerCollectors(cfg, cnt, st, log, tp)
 	runner := &collector.Runner{Store: st, Registry: reg, Logger: log}
 	var names []string
 	if only != "" {

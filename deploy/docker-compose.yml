@@ -1,0 +1,40 @@
+# divy.dev — `docker compose up` from the repository root (root compose.yaml includes this file).
+# Paths are relative to deploy/. The API serves the embedded site and runs the
+# in-process collector scheduler; samples live in the `data` volume (SQLite file).
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        # Origin baked into the prerendered pages; must match how you open the site.
+        SITE_ORIGIN: ${DOCKER_SITE_ORIGIN:-http://localhost:8080}
+    image: ghcr.io/divysinghvi/site:latest
+    ports:
+      - "8080:8080"
+    # Optional: the root .env (copy of .env.example) supplies DIVY_GITHUB_TOKEN,
+    # DIVY_COLLECT_TOKEN, CORS_ORIGINS, cadences… Values below win over it.
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      DIVY_ADDR: ":8080"
+      PORT: ""
+      DIVY_DB_URL: file:/data/divy.db
+      DIVY_CONTENT_DIR: /content
+      SITE_ORIGIN: ${DOCKER_SITE_ORIGIN:-http://localhost:8080}
+      TURSO_DATABASE_URL: ${TURSO_DATABASE_URL:-}
+      TURSO_AUTH_TOKEN: ${TURSO_AUTH_TOKEN:-}
+    volumes:
+      - data:/data
+    healthcheck:
+      test: ["CMD", "/divy", "ping", "--url", "http://127.0.0.1:8080/readyz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+volumes:
+  data:

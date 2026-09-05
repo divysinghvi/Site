@@ -51,6 +51,7 @@
 	import CurlBlock from '$lib/logql/CurlBlock.svelte';
 	import TimeRangePicker from '$lib/panels/TimeRangePicker.svelte';
 	import EmptyState from '$lib/panels/EmptyState.svelte';
+	import Seo from '$lib/components/ui/Seo.svelte';
 
 	let { data } = $props();
 
@@ -89,6 +90,7 @@
 		};
 	}
 
+	// svelte-ignore state_referenced_locally
 	let query = $state(data.snapshot.query);
 	let preset = $state<Preset>('all');
 	let customFrom = $state<number | undefined>(undefined);
@@ -425,13 +427,12 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Logs</title>
-	<meta
-		name="description"
-		content="The career log as Loki streams: LogQL with autocomplete, level filters, a volume histogram, expandable JSON lines linked to the trace, and a live-tail replay."
-	/>
-</svelte:head>
+<Seo
+	title="Logs · divy.dev"
+	description="The career log as Loki streams: LogQL with autocomplete, level filters, a volume histogram, expandable JSON lines linked to the trace, and a live-tail replay."
+	path="/logs"
+	origin={data.siteOrigin}
+/>
 
 <div class="logs" class:tailing={tail.active}>
 	<header class="head">

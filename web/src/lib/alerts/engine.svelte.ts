@@ -329,8 +329,12 @@ class AlertEngine {
 				next.firedAt = undefined;
 				next.reason = undefined;
 			}
+			// {{ $value }} only means something with a sample; otherwise keep the template as written
 			const labels = { ...(samples[0]?.labels ?? {}), ...def.labels };
-			next.summary = renderTemplate(def.annotations.summary ?? '', { value: next.value, labels });
+			next.summary =
+				samples.length > 0
+					? renderTemplate(def.annotations.summary ?? '', { value: next.value, labels })
+					: (def.annotations.summary ?? '');
 		} catch (e) {
 			next = {
 				...next,

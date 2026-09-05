@@ -20,6 +20,12 @@ divy_manual_metric_updated_timestamp_seconds{metric="x-metric"} 2
 # HELP divy_open_to_work Whether Divy is open to work (1) or not (0), from content/profile.yaml.
 # TYPE divy_open_to_work gauge
 divy_open_to_work{} 1
+# HELP divy_otel_export_errors_total Failed span export batches.
+# TYPE divy_otel_export_errors_total counter
+# HELP divy_otel_exported_spans_total Spans written to the otel_spans table.
+# TYPE divy_otel_exported_spans_total counter
+# HELP divy_otel_spans_total Root spans decided by the OpenTelemetry sampler, by decision (sampled, dropped by the rate cap, scrape = Prometheus scrapes of /metrics, never recorded).
+# TYPE divy_otel_spans_total counter
 # HELP divy_uptime_seconds Seconds since the API process started.
 # TYPE divy_uptime_seconds gauge
 divy_uptime_seconds{} 90

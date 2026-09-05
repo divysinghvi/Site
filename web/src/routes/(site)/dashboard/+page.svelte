@@ -29,6 +29,7 @@
 	import BarGaugePanel from '$lib/panels/BarGaugePanel.svelte';
 	import TimeRangePicker from '$lib/panels/TimeRangePicker.svelte';
 	import QueryInspector, { type InspectorEntry } from '$lib/panels/QueryInspector.svelte';
+	import Seo from '$lib/components/ui/Seo.svelte';
 
 	let { data } = $props();
 
@@ -290,13 +291,12 @@
 	);
 </script>
 
-<svelte:head>
-	<title>Metrics · {file.dashboard.title}</title>
-	<meta
-		name="description"
-		content="Grafana-style metrics dashboard fed by a Prometheus-compatible API: GitHub contributions, merged PRs, PyPI downloads, uptime — every number is a query result."
-	/>
-</svelte:head>
+<Seo
+	title="Metrics · {file.dashboard.title}"
+	description="Grafana-style metrics dashboard fed by a Prometheus-compatible API: GitHub contributions, merged PRs, PyPI downloads, uptime — every number is a query result."
+	path="/dashboard"
+	origin={data.siteOrigin}
+/>
 
 <div class="dash">
 	<header class="toolbar">

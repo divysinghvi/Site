@@ -5,13 +5,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="dark light" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<meta name="theme-color" content="#0b0c0e" />
 		<script>
-			// Theme before first paint: dark (default) | light | grafana2017, from localStorage.
+			// Theme before first paint: grafana2017 (Konami, sessionStorage) wins over
+			// the stored dark | light choice (localStorage); dark is the default.
 			(function () {
 				try {
-					var t = localStorage.getItem('divy.theme');
+					var t = sessionStorage.getItem('divy.theme.session');
+					if (t !== 'grafana2017') t = localStorage.getItem('divy.theme');
 					if (t === 'light' || t === 'grafana2017' || t === 'dark') {
 						document.documentElement.setAttribute('data-theme', t);
+						var c = { dark: '#0b0c0e', light: '#f4f5f5', grafana2017: '#0f1926' }[t];
+						var m = document.querySelector('meta[name="theme-color"]');
+						if (m && c) m.setAttribute('content', c);
 					}
 				} catch (e) {}
 			})();

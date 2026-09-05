@@ -1,0 +1,24 @@
+# Build context for deploy/Dockerfile (built from the repository root).
+.git
+.github
+.vercel
+.playwright
+.lighthouseci
+bin/
+data/
+docs/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+.env
+.env.*
+!.env.example
+web/node_modules/
+web/build/
+web/.svelte-kit/
+web/.playwright/
+web/test-results/
+internal/web/dist/*
+!internal/web/dist/.gitkeep
+**/.DS_Store

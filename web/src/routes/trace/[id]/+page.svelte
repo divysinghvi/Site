@@ -4,6 +4,7 @@
 	import type { PostmortemSummary } from '$lib/api/types.gen';
 	import TraceViewer from '$lib/components/trace/TraceViewer.svelte';
 	import TraceIdBox from '$lib/components/trace/TraceIdBox.svelte';
+	import Seo from '$lib/components/ui/Seo.svelte';
 
 	let { data } = $props();
 
@@ -20,10 +21,12 @@
 	let title = $derived(`Trace ${data.id}`);
 </script>
 
-<svelte:head>
-	<title>{title}</title>
-	<meta name="robots" content="noindex" />
-</svelte:head>
+<Seo
+	{title}
+	description="A trace in the site's Jaeger-shaped API: the career trace, or a request's own span from its X-Divy-Trace-Id."
+	path="/trace/{data.id}"
+	noindex
+/>
 
 <section class="page" aria-labelledby="trace-title">
 	<div class="head">

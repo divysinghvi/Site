@@ -102,6 +102,12 @@ func (c *client) once(ctx context.Context, body []byte, out any) (rl rateLimit, 
 	req.Header.Set("User-Agent", c.userAgent)
 	resp, err := c.http.Do(req)
 	if err != nil {
+		if ctx.Err() != nil {
+			// Keep the context error in the chain: fetchContributions cancels
+			// its sibling windows after a real failure and must recognise the
+			// cancellations it caused (errors.Is) to report the real error.
+			return rl, false, fmt.Errorf("github: request: %w", ctx.Err())
+		}
 		return rl, true, fmt.Errorf("github: request: %s", c.redact(err.Error()))
 	}
 	defer func() { _ = resp.Body.Close() }()

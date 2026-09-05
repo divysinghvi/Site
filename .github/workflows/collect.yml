@@ -1,0 +1,56 @@
+# Vercel has no in-process scheduler: this schedule calls the collect endpoint
+# every 5 minutes (GitHub's minimum) with the bearer token. The daily Vercel
+# cron in vercel.json is the fallback. Repo secrets: SITE_ORIGIN
+# (https://<project>.vercel.app) and DIVY_COLLECT_TOKEN (the same value set in
+# the Vercel project env). Without them the job skips.
+name: collect
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: run every collector even when it is not due (?force=1)
+        type: boolean
+        default: false
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: POST $SITE_ORIGIN/api/collect
+        env:
+          SITE_ORIGIN: ${{ secrets.SITE_ORIGIN }}
+          DIVY_COLLECT_TOKEN: ${{ secrets.DIVY_COLLECT_TOKEN }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          if [ -z "${SITE_ORIGIN:-}" ] || [ -z "${DIVY_COLLECT_TOKEN:-}" ]; then
+            echo "::notice::repo secrets SITE_ORIGIN and DIVY_COLLECT_TOKEN are not set; nothing to call"
+            exit 0
+          fi
+          url="${SITE_ORIGIN%/}/api/collect"
+          if [ "${FORCE:-false}" = "true" ]; then url="${url}?force=1"; fi
+          # -f: a 401/5xx fails the run (wrong token, endpoint down). Collector
+          # failures inside a 200 are reported as warnings, never as a red run —
+          # an upstream hiccup every 5 minutes would drown the Actions tab.
+          curl -fsS --max-time 60 -X POST -H "Authorization: Bearer ${DIVY_COLLECT_TOKEN}" "$url" -o summary.json -D headers.txt
+          grep -i "x-divy-trace-id" headers.txt || true
+          python3 - <<'PY'
+          import json
+          d = json.load(open("summary.json"))
+          for c in d["collectors"]:
+              err = c.get("error") or ""
+              state = "ok" if c["ok"] else ("skipped" if err.startswith("skipped:") else "FAILED")
+              print(f'{c["name"]:<10} {state:<8} items={c["items"]:<5} {c["duration_ms"]}ms  {err}')
+              if state == "FAILED":
+                  print(f'::warning title=collector {c["name"]}::{err}')
+          print(f'budget {d["budget_ms"]}ms truncated={d["truncated"]}')
+          PY

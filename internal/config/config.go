@@ -39,18 +39,42 @@ type Config struct {
 	CollectDisabled   []string
 
 	// Server extras used by later packages.
-	CORSOrigins         []string
-	TrustedProxies      []string
-	QueryLookback       time.Duration // QUERY_LOOKBACK_DELTA
-	QueryTimeout        time.Duration // QUERY_TIMEOUT
-	QueryMaxSamples     int           // QUERY_MAX_SAMPLES
-	QueryMaxConcurrency int           // QUERY_MAX_CONCURRENCY
-	OTelServiceName     string
-	OTelSampleRPS       float64 // OTEL_SAMPLE_RPS: root spans recorded per second
-	OTelSampleBurst     int     // OTEL_SAMPLE_BURST
-	RateLimitRPS        float64 // RATE_LIMIT_RPS: per-client token bucket refill
-	RateLimitBurst      int     // RATE_LIMIT_BURST
-	ResponseCache       bool    // RESPONSE_CACHE (default on; "off"/"0"/"false" disables the in-memory response cache)
+	CORSOrigins          []string
+	TrustedProxies       []string
+	QueryLookback        time.Duration // QUERY_LOOKBACK_DELTA
+	QueryTimeout         time.Duration // QUERY_TIMEOUT
+	QueryMaxSamples      int           // QUERY_MAX_SAMPLES
+	QueryMaxConcurrency  int           // QUERY_MAX_CONCURRENCY
+	OTelServiceName      string
+	OTelTracing          bool    // OTEL_TRACING (default on; "off"/"0"/"false" disables self-tracing and the X-Divy-Trace-Id header)
+	OTelSampleRPS        float64 // OTEL_SAMPLE_RPS: root spans recorded per second
+	OTelSampleBurst      int     // OTEL_SAMPLE_BURST
+	RateLimitRPS         float64 // RATE_LIMIT_RPS: per-client token bucket refill ("0"/"off" disables rate limiting)
+	RateLimitBurst       int     // RATE_LIMIT_BURST
+	RateLimitGlobalRPS   float64 // RATE_LIMIT_GLOBAL_RPS: one bucket shared by /healthz, /readyz and /metrics
+	RateLimitGlobalBurst int     // RATE_LIMIT_GLOBAL_BURST
+	ResponseCache        bool    // RESPONSE_CACHE (default on; "off"/"0"/"false" disables the in-memory response cache)
+	// TrustProxyHeaders believes X-Forwarded-For / X-Real-IP from any peer
+	// (TRUST_PROXY_HEADERS; default on when VERCEL is set — the platform sets them).
+	TrustProxyHeaders bool
+}
+
+// offValues are the spellings that turn a boolean knob off.
+func isOff(v string) bool {
+	switch strings.ToLower(strings.TrimSpace(v)) {
+	case "off", "0", "false", "no":
+		return true
+	}
+	return false
+}
+
+// isOn reports whether v is an explicit "on" spelling.
+func isOn(v string) bool {
+	switch strings.ToLower(strings.TrimSpace(v)) {
+	case "on", "1", "true", "yes":
+		return true
+	}
+	return false
 }
 
 // FromEnv builds the config from getenv (os.Getenv in production).
@@ -148,16 +172,23 @@ func FromEnv(getenv func(string) string) (Config, error) {
 	}{
 		{&c.OTelSampleRPS, "OTEL_SAMPLE_RPS", 100, "otel sample rps"},
 		{&c.RateLimitRPS, "RATE_LIMIT_RPS", 20, "rate limit rps"},
+		{&c.RateLimitGlobalRPS, "RATE_LIMIT_GLOBAL_RPS", 50, "global rate limit rps"},
 	}
 	for _, d := range floats {
 		*d.dst = d.def
-		if v := strings.TrimSpace(getenv(d.key)); v != "" {
-			f, err := strconv.ParseFloat(v, 64)
-			if err != nil || f <= 0 {
-				return c, fmt.Errorf("%s: %s must be a positive number", d.key, d.name)
-			}
-			*d.dst = f
+		v := strings.TrimSpace(getenv(d.key))
+		if v == "" {
+			continue
 		}
+		if strings.HasPrefix(d.key, "RATE_LIMIT") && isOff(v) {
+			*d.dst = 0 // rate limiting off
+			continue
+		}
+		f, err := strconv.ParseFloat(v, 64)
+		if err != nil || f <= 0 {
+			return c, fmt.Errorf("%s: %s must be a positive number", d.key, d.name)
+		}
+		*d.dst = f
 	}
 	bursts := []struct {
 		dst  *int
@@ -167,6 +198,7 @@ func FromEnv(getenv func(string) string) (Config, error) {
 	}{
 		{&c.OTelSampleBurst, "OTEL_SAMPLE_BURST", 200, "otel sample burst"},
 		{&c.RateLimitBurst, "RATE_LIMIT_BURST", 100, "rate limit burst"},
+		{&c.RateLimitGlobalBurst, "RATE_LIMIT_GLOBAL_BURST", 200, "global rate limit burst"},
 	}
 	for _, d := range bursts {
 		*d.dst = d.def
@@ -178,10 +210,16 @@ func FromEnv(getenv func(string) string) (Config, error) {
 			*d.dst = n
 		}
 	}
-	c.ResponseCache = true
-	switch strings.ToLower(strings.TrimSpace(getenv("RESPONSE_CACHE"))) {
-	case "off", "0", "false", "no":
-		c.ResponseCache = false
+	c.ResponseCache = !isOff(getenv("RESPONSE_CACHE"))
+	c.OTelTracing = !isOff(getenv("OTEL_TRACING"))
+	onVercel := strings.TrimSpace(getenv("VERCEL")) != ""
+	switch v := getenv("TRUST_PROXY_HEADERS"); {
+	case isOn(v):
+		c.TrustProxyHeaders = true
+	case isOff(v):
+		c.TrustProxyHeaders = false
+	default:
+		c.TrustProxyHeaders = onVercel
 	}
 	if c.UptimeSelfURL == "" && c.SiteOrigin != "" {
 		c.UptimeSelfURL = strings.TrimRight(c.SiteOrigin, "/") + "/readyz"

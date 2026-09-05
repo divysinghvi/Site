@@ -137,6 +137,10 @@ const (
 	CacheIMM   = "public, max-age=31536000, immutable"
 )
 
+// DefaultCacheEntries is the response-cache size the binary uses when
+// RESPONSE_CACHE is on (Config.CacheEntries).
+const DefaultCacheEntries = cacheDefaultEntries
+
 // New builds the router.
 func New(cfg Config) (*Server, error) {
 	if cfg.Content == nil {
@@ -200,6 +204,10 @@ func New(cfg Config) (*Server, error) {
 	s.metrics = cfg.Metrics
 	if s.metrics == nil {
 		s.metrics = metrics.New(metrics.Options{Store: cfg.Store, Live: s.live, Intervals: intervals, Now: cfg.Now, Logger: cfg.Logger})
+	}
+	if cfg.Trace != nil {
+		// The sampler/exporter counters (divy_otel_*) live in the registry behind /metrics.
+		cfg.Trace.SetMetrics(s.metrics)
 	}
 	proxies, err := newProxyTrust(cfg.TrustedProxies, cfg.TrustProxyHeaders)
 	if err != nil {

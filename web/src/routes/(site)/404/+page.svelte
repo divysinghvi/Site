@@ -1,7 +1,8 @@
-<svelte:head>
-	<title>Not found</title>
-	<meta name="robots" content="noindex" />
-</svelte:head>
+<script lang="ts">
+	import Seo from '$lib/components/ui/Seo.svelte';
+</script>
+
+<Seo title="Not found · divy.dev" description="No route matched this path." path="/404" noindex />
 
 <section class="panel mx-auto mt-6 max-w-3xl">
 	<div class="panel-header"><h1 class="text-sm font-semibold">404 · Not found</h1></div>

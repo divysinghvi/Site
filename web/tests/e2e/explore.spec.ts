@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 // Explore: URL-driven PromQL runs, graph/table results, the curl line,
 // autocomplete from /api/v1/label/__name__/values, the panel → Explore link,
-// API error text, and the reserved Loki tab.
+// API error text, and the Loki tab (the LogQL bar and log list of /logs).
 
 async function ready(page: Page, path: string) {
 	await page.goto(path);
@@ -80,11 +80,18 @@ test.describe('explore', () => {
 		);
 	});
 
-	test('the Loki tab is reserved for the logs step', async ({ page }) => {
+	test('the Loki tab runs LogQL and lists log lines', async ({ page }) => {
 		await ready(page, '/explore');
 		await page.getByRole('tab', { name: 'Loki' }).click();
-		await expect(page.getByRole('tabpanel')).toContainText('Logs explorer lands in the next step');
 		await expect(page).toHaveURL(/ds=loki/);
+		const box = page.getByRole('combobox', { name: 'LogQL query' });
+		await expect(box).toBeVisible();
+		await expect(page.locator('[data-log-row]').first()).toBeVisible({ timeout: 15_000 });
+		await box.fill('{service="gradr"} |= "promoted"');
+		await page.keyboard.press('Enter');
+		await expect(page.locator('[data-log-row]')).toHaveCount(1, { timeout: 15_000 });
+		await expect(page.locator('[data-log-row]').first()).toContainText('promoted');
+		await expect(page.locator('[data-curl]')).toContainText('/loki/api/v1/query_range');
 	});
 
 	test('/ focuses the query bar', async ({ page }) => {
